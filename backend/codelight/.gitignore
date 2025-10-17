@@ -35,3 +35,74 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# ========================
+# ☕ Java / Spring Boot (Backend)
+# ========================
+.gradle/
+target/
+.env
+.settings/
+
+# gradle wrapper logs
+gradle-app.setting
+gradle-app.properties
+
+# yml files
+src/main/resources/*.yml
+src/test/resources/*.yml
+
+# Spring Boot specific
+*.jar
+*.war
+
+# ========================
+# ⚙️ System & OS
+# ========================
+*.bak
+*.orig
+*.rej
+*~
+*.lock
+*.tmp
+*.DS_Store
+ehthumbs.db
+Icon?
+__MACOSX/
+
+# ========================
+# 🧱 Test / Coverage
+# ========================
+coverage/
+reports/
+test-output/
+jacoco/
+*.lcov
+*.coverage
+
+# ========================
+# 🔐 Environment & Keys
+# ========================
+.env.*
+!example.env
+*.pem
+*.key
+*.crt
+*.keystore
+*.p12
+*.jks
+
+# ========================
+# 🪣 AWS / Deployment
+# ========================
+.aws/
+.secrets/
+credentials.json
+deploy.sh
+docker-compose.override.yml
+
+# ========================
+# 🧩 Misc
+# ========================
+.local/
+

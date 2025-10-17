@@ -26,9 +26,7 @@ dist-ssr
 # ========================
 # 🧠 General
 # ========================
-.DS_Store
 Thumbs.db
-*.log
 logs/
 *.tmp
 *.swp
@@ -49,55 +47,19 @@ out/
 # ========================
 # 🧑‍💻 Node / React (Frontend)
 # ========================
-frontend/node_modules/
-frontend/dist/
-frontend/build/
-frontend/.env
-frontend/.env.local
-frontend/.eslintcache
-frontend/coverage/
-frontend/.turbo/
-frontend/.parcel-cache/
-frontend/.next/
-frontend/.vercel/
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-frontend/pnpm-debug.log*
-frontend/.vite/
-frontend/.cache/
-
-# ========================
-# ☕ Java / Spring Boot (Backend)
-# ========================
-backend/codelight/.gradle/
-backend/codelight/build/
-backend/codelight/out/
-backend/codelight/target/
-backend/codelight/.env
-backend/codelight/.classpath
-backend/codelight/.project
-backend/codelight/.settings/
-backend/codelight/.factorypath
-
-# gradle wrapper logs
-backend/codelight/gradle-app.setting
-backend/codelight/gradle-app.properties
-
-# yml files 
-backend/codelight/src/main/resources/application-*.yml
-
-# Spring Boot specific
-backend/codelight/*.jar
-backend/codelight/*.war
-
-# ========================
-# 🐳 Docker
-# ========================
-docker/*.env
-docker/*.log
-docker/tmp/
-*.pid
+node_modules/
+dist/
+build/
+.env
+.env.local
+.eslintcache
+coverage/
+.turbo/
+.parcel-cache/
+.next/
+.vercel/
+.vite/
+.cache/
 
 # ========================
 # ⚙️ System & OS
@@ -107,7 +69,6 @@ docker/tmp/
 *.rej
 *~
 *.lock
-*.tmp
 *.DS_Store
 ehthumbs.db
 Icon?
@@ -116,7 +77,6 @@ __MACOSX/
 # ========================
 # 🧱 Test / Coverage
 # ========================
-coverage/
 reports/
 test-output/
 jacoco/
@@ -126,7 +86,6 @@ jacoco/
 # ========================
 # 🔐 Environment & Keys
 # ========================
-.env
 .env.*
 !example.env
 *.pem
