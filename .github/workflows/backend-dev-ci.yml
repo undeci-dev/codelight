@@ -1,0 +1,46 @@
+name: backend-dev-ci
+
+on:
+  pull_request:
+    branches: ["dev"]
+    paths:
+      - "backend/**"
+
+defaults:
+  run:
+    working-directory: backend/codelight
+
+jobs:
+  build:
+    runs-on: codelight-dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.1
+
+      - name: Run chmod to make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: |
+          echo "::group::Gradle Build Start"
+          echo "Java version:"
+          java -version
+          echo "Gradle version:"
+          ./gradlew --version
+          echo "::notice::Starting './gradlew build' in backend/codelight"
+          set -e
+          ./gradlew build
+          echo "::notice::Gradle build completed successfully"
+          echo "::endgroup::"
