@@ -1,20 +1,17 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import router from '@/routers/router';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import { queryClient } from '@/utils/queryClient';
+import Toast from '@/components/_common/Toast/Toast';
+import useToast from '@/hooks/useToast';
 
 function App() {
+  const { toast, type } = useToast();
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      {toast && <Toast type={type} message={toast} />}
     </QueryClientProvider>
   );
 }
