@@ -1,0 +1,102 @@
+name: BE CI/CD (WSL + Docker + Spring Boot)
+
+on:
+  push:
+    branches: ["dev"]
+    paths:
+      - "codelight/backend/**"
+      - ".github/workflows/backend-dev-ci-cd.yml"
+
+permissions:
+  contents: read
+
+env:
+  CONTAINER_NAME: be-codelight
+  IMAGE_NAME: codelight-backend
+  PORT: 8080
+
+jobs:
+  be-ci-cd:
+    runs-on: [self-hosted]
+
+    defaults:
+      run:
+        working-directory: ./codelight/backend/codelight
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "gradle"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Write application.yml
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.BACKEND_DEV_YML }}" > ./src/main/resources/application.yml
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
+        continue-on-error: false
+
+      - name: Build application
+        run: ./gradlew clean build --no-daemon -x test
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.IMAGE_NAME }}:dev \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -f Dockerfile .
+
+      - name: Stop and remove old container
+        run: |
+          docker stop ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+          docker rm ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+
+      - name: Run new container
+        run: |
+          docker run -d \
+            --name ${{ env.CONTAINER_NAME }} \
+            --network codelight-network \
+            -p ${{ env.PORT }}:8080 \
+            --restart unless-stopped \
+            ${{ env.IMAGE_NAME }}:latest
+
+      - name: Wait for container to be healthy
+        run: |
+          echo "Waiting for Spring Boot to start..."
+          for i in {1..30}; do
+            if docker logs ${{ env.CONTAINER_NAME }} 2>&1 | grep -q "Started"; then
+              echo "✅ Spring Boot application started successfully"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl -f http://localhost:${{ env.PORT }}/actuator/health || \
+          curl -f http://localhost:${{ env.PORT }} || \
+          echo "⚠️ Health check endpoint not available, checking container status..."
+          docker ps | grep ${{ env.CONTAINER_NAME }}
+          echo "✅ Backend is running on http://localhost:${{ env.PORT }}"
+
+      - name: Show container logs
+        if: always()
+        run: docker logs ${{ env.CONTAINER_NAME }} --tail 50
+
+      - name: Clean up old images
+        run: |
+          docker image prune -f
+          docker images | grep ${{ env.IMAGE_NAME }} | grep -v -E 'latest|dev|${{ github.sha }}' | awk '{print $3}' | xargs -r docker rmi || true

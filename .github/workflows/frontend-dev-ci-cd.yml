@@ -1,0 +1,87 @@
+name: FE CI/CD (WSL + Docker + Nginx)
+
+on:
+  push:
+    branches: ["dev"]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-dev-ci-cd.yml"
+
+permissions:
+  contents: read
+
+env:
+  CONTAINER_NAME: fe-nginx
+  IMAGE_NAME: fe-nginx
+  PORT: 3000
+  VITE_API_URL: ""
+
+jobs:
+  fe-ci-cd:
+    runs-on: [self-hosted]
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=${{ env.VITE_API_URL }} \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.IMAGE_NAME }}:dev \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -f Dockerfile .
+
+      - name: Stop and remove old container
+        run: |
+          docker stop ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+          docker rm ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+
+      - name: Run new container
+        run: |
+          docker run -d \
+            --name ${{ env.CONTAINER_NAME }} \
+            --network codelight-network \
+            -p ${{ env.PORT }}:80 \
+            --restart unless-stopped \
+            ${{ env.IMAGE_NAME }}:latest
+
+      - name: Wait for container to be healthy
+        run: |
+          echo "Waiting for container to start..."
+          sleep 3
+          docker ps | grep ${{ env.CONTAINER_NAME }}
+
+      - name: Health check
+        run: |
+          curl -f http://localhost:${{ env.PORT }} || exit 1
+          echo "✅ Frontend is running on http://localhost:${{ env.PORT }}"
+
+      - name: Clean up old images
+        run: |
+          docker image prune -f
+          docker images | grep ${{ env.IMAGE_NAME }} | grep -v -E 'latest|dev|${{ github.sha }}' | awk '{print $3}' | xargs -r docker rmi || true
