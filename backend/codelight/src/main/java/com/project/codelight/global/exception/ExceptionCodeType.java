@@ -30,11 +30,16 @@ public enum ExceptionCodeType {
 
     // 로그인
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, ExceptionCode.USER_NOT_FOUND, "유저가 존재하지 않습니다."),
+    USER_LOGIN_REQUEST_ERROR(HttpStatus.UNAUTHORIZED, ExceptionCode.LOGIN_ERROR, "로그인 요청에 실패했습니다."),
+    USER_INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, ExceptionCode.LOGIN_ERROR,
+        "사용자 정보가 올바르지 않습니다."),
     USER_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, ExceptionCode.LOGIN_ERROR,
         "비밀번호가 일치하지 않습니다."),
+    USER_ACCOUNT_DELETED(HttpStatus.FORBIDDEN, ExceptionCode.AUTH_ERROR, "탈퇴한 계정입니다."),
     USER_ACCOUNT_BANNED(HttpStatus.FORBIDDEN, ExceptionCode.AUTH_ERROR, "정지된 계정입니다."),
 
     // 토큰
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_ERROR, "토큰이 존재하지 않습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_ERROR, "토큰이 만료되었습니다."),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_ERROR, "유효하지 않은 토큰입니다."),
     TOKEN_REFRESH_FAILED(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_ERROR,

@@ -19,7 +19,7 @@ public class CodeLightException extends RuntimeException {
         return exceptionCodeType.getHttpStatus();
     }
 
-    public String getClientExceptionCodeName() {
+    public String getExceptionCodeName() {
         return exceptionCodeType.getExceptionCode().name();
     }
 }
