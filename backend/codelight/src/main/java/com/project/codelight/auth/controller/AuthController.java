@@ -1,7 +1,7 @@
 package com.project.codelight.auth.controller;
 
+import com.project.codelight.auth.dto.request.SignUpRequest;
 import com.project.codelight.auth.service.AuthService;
-import com.project.codelight.user.dto.SignUpRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
