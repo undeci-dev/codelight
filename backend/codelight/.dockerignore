@@ -41,9 +41,8 @@ docs
 # Environment
 .env
 .env.local
-.env.development
-.env.test
-.env.production
+.env.dev
+.env.prod
 
 # Docker
 Dockerfile
