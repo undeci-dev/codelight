@@ -1,11 +1,11 @@
 package com.project.codelight.auth.service;
 
+import com.project.codelight.auth.dto.request.SignUpRequest;
+import com.project.codelight.auth.repository.AuthRepository;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;
-import com.project.codelight.user.dto.SignUpRequest;
-import com.project.codelight.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
 
     private final PasswordEncoder pwEncoder;
 
@@ -26,19 +26,18 @@ public class AuthService {
     }
 
     private User processUser(LoginType loginType, User user) {
-        return userRepository.findUserIncludingDeletedByEmailAndLoginType(user.getEmail(),
+        return authRepository.findUserIncludingDeletedByEmailAndLoginType(user.getEmail(),
                                  loginType)
                              .map(savedUser -> verifyExistingUserStatus(savedUser, loginType))
                              .orElseGet(() -> {
                                  String encodedPassword = pwEncoder.encode(user.getPassword());
-                                 User newUser = new User(
-                                     user.getName(),
-                                     user.getEmail(),
-                                     encodedPassword,
-                                     user.getUserRole(),
-                                     user.getLoginType()
-                                 );
-                                 return userRepository.save(newUser);
+                                 User newUser = User.builder()
+                                                    .name(user.getName())
+                                                    .email(user.getEmail())
+                                                    .password(encodedPassword)
+                                                    .userRole(user.getUserRole())
+                                                    .loginType(user.getLoginType()).build();
+                                 return authRepository.save(newUser);
                              });
     }
 
@@ -56,7 +55,7 @@ public class AuthService {
 
     private void restoreUser(User user, LoginType loginType) {
         if (user.isDeleted()) {
-            userRepository.restoreUserByEmailAndLoginType(user.getEmail(), loginType);
+            authRepository.restoreUserByEmailAndLoginType(user.getEmail(), loginType);
         }
     }
 }
