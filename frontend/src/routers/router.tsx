@@ -2,7 +2,9 @@ import React, { Suspense } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { ROUTE_PATH } from '@/constants/routhPath';
 
+const MainPage = React.lazy(() => import('@/pages/MainPage'));
 const SignUpPage = React.lazy(() => import('@/pages/SignUpPage'));
+const SignInPage = React.lazy(() => import('@/pages/SignInPage'));
 
 const router = createBrowserRouter([
   {
@@ -15,6 +17,14 @@ const router = createBrowserRouter([
       {
         element: <SignUpPage />,
         path: ROUTE_PATH.signUp,
+      },
+      {
+        element: <SignInPage />,
+        path: ROUTE_PATH.signIn,
+      },
+      {
+        element: <MainPage />,
+        path: ROUTE_PATH.main,
       },
     ],
   },
