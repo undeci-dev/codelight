@@ -1,10 +1,14 @@
 package com.project.codelight.auth.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.codelight.auth.constants.TokenExpiration;
+import com.project.codelight.auth.domain.RefreshToken;
+import com.project.codelight.auth.repository.RefreshTokenRepository;
 import com.project.codelight.auth.security.model.CustomUserDetails;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.User;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,8 +27,8 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 @RequiredArgsConstructor
 public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-    private final TokenUtils tokenUtils;
     private final ObjectMapper objectMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -36,14 +40,27 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
 
         if (user.isDeleted()) {
             responseMap.put("status", HttpStatus.FORBIDDEN.value());
-            responseMap.put("token", null);
+            responseMap.put("accessToken", null);
+            responseMap.put("refreshToken", null);
             responseMap.put("codeLightCode", ExceptionCodeType.USER_ACCOUNT_DELETED);
         } else {
+            String accessToken = TokenUtils.generateAccessToken(user);
+            String refreshToken = TokenUtils.generateRefreshToken(user);
+
             responseMap.put("status", HttpStatus.OK.value());
-            String token = tokenUtils.generateJwt(user);
-            responseMap.put("token", token);
+            responseMap.put("accessToken", accessToken);
             responseMap.put("codeLightCode", null);
-//            response.addHeader("Authorization", "BEARER " + token);
+
+            Cookie refreshCookie = TokenUtils.createRefreshTokenCookie(refreshToken);
+            response.addCookie(refreshCookie);
+
+            // Redis에 RefreshToken 저장
+            RefreshToken redisRefreshToken = RefreshToken.builder()
+                                                         .userId(user.getId())
+                                                         .token(refreshToken)
+                                                         .expiration(TokenExpiration.REFRESH_TOKEN.getExpirationInSeconds())
+                                                         .build();
+            refreshTokenRepository.save(redisRefreshToken);
         }
 
         response.setCharacterEncoding("UTF-8");
