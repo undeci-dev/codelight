@@ -1,12 +1,13 @@
 package com.project.codelight.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.codelight.auth.repository.RefreshTokenRepository;
+import com.project.codelight.auth.repository.TokenBlackListRepository;
 import com.project.codelight.auth.security.filter.CustomAuthenticationFilter;
 import com.project.codelight.auth.security.filter.JwtAuthorizationFilter;
 import com.project.codelight.auth.security.handler.CustomAuthFailureHandler;
 import com.project.codelight.auth.security.handler.CustomAuthSuccessHandler;
 import com.project.codelight.auth.security.handler.CustomAuthenticationProvider;
-import com.project.codelight.auth.util.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +29,10 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final TokenUtils tokenUtils;
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenBlackListRepository tokenBlackListRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -82,7 +84,7 @@ public class WebSecurityConfig {
 
     @Bean
     public CustomAuthSuccessHandler customLoginSuccessHandler() {
-        return new CustomAuthSuccessHandler(tokenUtils, objectMapper);
+        return new CustomAuthSuccessHandler(objectMapper, refreshTokenRepository);
     }
 
     @Bean
@@ -92,7 +94,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(tokenUtils, objectMapper);
+        return new JwtAuthorizationFilter(tokenBlackListRepository);
     }
 
 
