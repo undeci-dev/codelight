@@ -44,8 +44,9 @@ public class User extends BaseEntity {
     private LoginType loginType;
 
     @Builder(toBuilder = true)
-    public User(String name, String email, String password, UserRole userRole,
+    public User(Long id, String name, String email, String password, UserRole userRole,
                 LoginType loginType) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
