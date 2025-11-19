@@ -2,6 +2,7 @@ import fetcher from '@/apis/fetcher';
 import { BASE_URL, ENDPOINT } from '@/apis/endpoint';
 import { SignInResponse } from '@/types/user';
 import AppError from '@/core/error/AppError';
+import useAuthStore from '@/store/useAuthStore';
 
 export const signUp = async ({
   name,
@@ -35,6 +36,17 @@ export const signIn = async ({
   if (data.status !== 200)
     throw new AppError(data.status, 'USER_ACCOUNT_DELETED');
 
-  localStorage.setItem('token', data.token);
+  useAuthStore.getState().setAccessToken(data.accessToken);
   return response;
+};
+
+export const logOut = async () => {
+  try {
+    const response = await fetcher.post({ url: BASE_URL + ENDPOINT.LOG_OUT });
+    useAuthStore.getState().clearAccessToken();
+    return response;
+  } catch (err) {
+    throw new AppError(500, 'INTERNAL_SERVER_ERROR');
+    throw err;
+  }
 };

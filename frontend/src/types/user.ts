@@ -26,7 +26,8 @@ export interface SignInRequest {
 
 export interface SignInResponse {
   status: number;
-  token: string;
+  accessToken: string;
+  refreshToken?: string; // HttpOnly Cookie로 전달되므로 optional
   codeLightCode: string;
 }
 
