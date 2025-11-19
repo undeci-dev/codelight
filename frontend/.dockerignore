@@ -22,11 +22,10 @@ coverage
 **/__mocks__
 
 # Environment files
+.env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
+.env.dev
+.env.prod
 
 # IDE
 .vscode

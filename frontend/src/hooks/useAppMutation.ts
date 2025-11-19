@@ -4,15 +4,12 @@ import {
   type MutationKey,
 } from '@tanstack/react-query';
 import useToast from '@/hooks/useToast';
+import AppError from '@/core/error/AppError';
 
-/**
- * 커스텀 에러 타입
- * API 에러 응답의 구조를 정의합니다
- */
 interface ApiError extends Error {
-  message: string;
-  code?: string;
-  status?: number;
+  statusCode?: number;
+  errorMessage: string;
+  errorCode?: string;
 }
 
 /**
@@ -30,6 +27,10 @@ type AppMutationOptions<TData, TError, TVariables, TContext> = Omit<
   errorMessage?: string;
   throwOnError?: boolean;
 };
+
+export function isAppError(error: unknown): error is AppError {
+  return error instanceof AppError;
+}
 
 /**
  * TanStack Query의 useMutation을 래핑한 커스텀 훅
@@ -66,11 +67,15 @@ export function useAppMutation<
       }
       onSuccess?.(...args);
     },
-    onError: (...args) => {
-      if (errorMessage) {
-        addToast({ message: errorMessage, type: 'error' });
+    onError: (error, ...args) => {
+      const customMessage = isAppError(error)
+        ? error.errorMessage
+        : errorMessage;
+
+      if (customMessage) {
+        addToast({ message: customMessage, type: 'error' });
       }
-      onError?.(...args);
+      onError?.(error, ...args);
     },
   });
 }
