@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,20 +43,14 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
-    public User(String name, String email, UserRole userRole, LoginType loginType) {
-        this.name = name;
-        this.email = email;
-        this.userRole = userRole;
-        this.loginType = loginType;
-    }
-
-    public User(String name, String email, String password, UserRole userRole,
+    @Builder(toBuilder = true)
+    public User(Long id, String name, String email, String password, UserRole userRole,
                 LoginType loginType) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.userRole = userRole;
         this.loginType = loginType;
     }
-    
 }

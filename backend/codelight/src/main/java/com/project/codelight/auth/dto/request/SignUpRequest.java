@@ -1,4 +1,4 @@
-package com.project.codelight.user.dto;
+package com.project.codelight.auth.dto.request;
 
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;
@@ -35,6 +35,11 @@ public class SignUpRequest {
     }
 
     public User toUserEntity() {
-        return new User(name, email, password, UserRole.USER, LoginType.LOCAL);
+        return User.builder()
+                   .name(name)
+                   .email(email)
+                   .password(password)
+                   .userRole(UserRole.USER)
+                   .loginType(LoginType.LOCAL).build();
     }
 }
