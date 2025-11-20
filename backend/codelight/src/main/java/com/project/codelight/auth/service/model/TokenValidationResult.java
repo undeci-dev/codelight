@@ -1,4 +1,4 @@
-package com.project.codelight.auth.service.dto;
+package com.project.codelight.auth.service.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;

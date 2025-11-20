@@ -1,7 +1,7 @@
 package com.project.codelight.auth.util;
 
 import com.project.codelight.auth.constants.TokenExpiration;
-import com.project.codelight.auth.service.dto.TokenValidationResult;
+import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.User;
 import io.jsonwebtoken.Claims;

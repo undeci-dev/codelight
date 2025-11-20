@@ -1,7 +1,7 @@
 package com.project.codelight.auth.security.filter;
 
 import com.project.codelight.auth.repository.TokenBlackListRepository;
-import com.project.codelight.auth.service.dto.TokenValidationResult;
+import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
