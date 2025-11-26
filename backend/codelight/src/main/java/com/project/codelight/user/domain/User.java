@@ -3,6 +3,8 @@ package com.project.codelight.user.domain;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.project.codelight.BaseEntity;
+import com.project.codelight.auth.domain.OAuthAccount;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +12,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +47,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OAuthAccount> oauthAccounts = new ArrayList<>();
 
     @Builder(toBuilder = true)
     public User(Long id, String name, String email, String password, UserRole userRole,

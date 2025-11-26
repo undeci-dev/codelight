@@ -5,34 +5,18 @@ import com.project.codelight.user.domain.User;
 import com.project.codelight.user.domain.UserRole;
 import jakarta.validation.constraints.NotBlank;
 
-public class SignUpRequest {
+public record SignUpRequest(
 
     @NotBlank(message = "이름이 존재하지 않습니다.")
-    private final String name;
+    String name,
 
     @NotBlank(message = "이메일이 존재하지 않습니다.")
-    private final String email;
+    String email,
 
     @NotBlank(message = "비밀번호가 존재하지 않습니다.")
-    private final String password;
+    String password
 
-    public SignUpRequest(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+) {
 
     public User toUserEntity() {
         return User.builder()
@@ -40,6 +24,7 @@ public class SignUpRequest {
                    .email(email)
                    .password(password)
                    .userRole(UserRole.USER)
-                   .loginType(LoginType.LOCAL).build();
+                   .loginType(LoginType.LOCAL)
+                   .build();
     }
 }

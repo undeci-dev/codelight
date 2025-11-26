@@ -1,7 +1,7 @@
 package com.project.codelight.auth.util;
 
 import com.project.codelight.auth.constants.TokenExpiration;
-import com.project.codelight.auth.service.dto.TokenValidationResult;
+import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.User;
 import io.jsonwebtoken.Claims;
@@ -71,13 +71,13 @@ public class TokenUtils {
                                         .build();
         } catch (ExpiredJwtException exception) {
             return TokenValidationResult.builder().isValid(false).exceptionCodeTypeName(
-                ExceptionCodeType.TOKEN_EXPIRED.name()).build();
+                ExceptionCodeType.TOKEN_EXPIRED.getExceptionCode().name()).build();
         } catch (JwtException exception) {
             return TokenValidationResult.builder().isValid(false).exceptionCodeTypeName(
-                ExceptionCodeType.TOKEN_INVALID.name()).build();
+                ExceptionCodeType.TOKEN_INVALID.getExceptionCode().name()).build();
         } catch (NullPointerException exception) {
             return TokenValidationResult.builder().isValid(false).exceptionCodeTypeName(
-                ExceptionCodeType.TOKEN_NOT_FOUND.name()).build();
+                ExceptionCodeType.TOKEN_NOT_FOUND.getExceptionCode().name()).build();
         }
     }
 

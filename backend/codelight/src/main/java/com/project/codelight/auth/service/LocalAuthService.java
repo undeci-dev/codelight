@@ -7,7 +7,7 @@ import com.project.codelight.auth.dto.response.ReissueTokenResponse;
 import com.project.codelight.auth.repository.AuthRepository;
 import com.project.codelight.auth.repository.RefreshTokenRepository;
 import com.project.codelight.auth.repository.TokenBlackListRepository;
-import com.project.codelight.auth.service.dto.TokenValidationResult;
+import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class AuthService {
+public class LocalAuthService {
 
     private final AuthRepository authRepository;
     private final RefreshTokenRepository refreshTokenRepository;

@@ -1,7 +1,7 @@
 package com.project.codelight.auth.security.filter;
 
 import com.project.codelight.auth.repository.TokenBlackListRepository;
-import com.project.codelight.auth.service.dto.TokenValidationResult;
+import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
@@ -29,9 +29,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static final List<String> notUseJwtUrlList = Arrays.asList(
         "/api/local-auth/login",
         "/api/local-auth/register",
-        "/api/local-auth/token"
+        "/api/local-auth/token",
+        "/api/oauth/kakao/login"
     );
-    private static final String TOKEN_BLACK_LIST = "tokenBlackList";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -66,7 +66,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     }
                 } else {
                     if (tokenValidationResult.getExceptionCodeTypeName().equals(
-                        ExceptionCodeType.TOKEN_EXPIRED.name())) {
+                        ExceptionCodeType.TOKEN_EXPIRED.getExceptionCode().name())) {
                         throw new CodeLightException(
                             ExceptionCodeType.TOKEN_EXPIRED);
                     }

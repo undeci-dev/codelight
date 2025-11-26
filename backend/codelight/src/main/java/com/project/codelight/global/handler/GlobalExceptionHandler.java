@@ -1,7 +1,7 @@
 package com.project.codelight.global.handler;
 
 import com.project.codelight.global.exception.CodeLightException;
-import com.project.codelight.global.exception.ExceptionResponse;
+import com.project.codelight.global.exception.dto.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
