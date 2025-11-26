@@ -1,6 +1,6 @@
 import fetcher from '@/apis/fetcher';
 import { BASE_URL, ENDPOINT } from '@/apis/endpoint';
-import { SignInResponse } from '@/types/user';
+import { SignInResponse, KakaoLoginResponse } from '@/types/user';
 import AppError from '@/core/error/AppError';
 import useAuthStore from '@/store/useAuthStore';
 
@@ -49,4 +49,16 @@ export const logOut = async () => {
     throw new AppError(500, 'INTERNAL_SERVER_ERROR');
     throw err;
   }
+};
+
+export const kakaoLogin = async ({ code }: { code: string }) => {
+  const response = await fetcher.post({
+    url: `${BASE_URL}${ENDPOINT.OAUTH_LOGIN}`,
+    params: { code },
+  });
+
+  const data: KakaoLoginResponse = await response.json();
+
+  useAuthStore.getState().setAccessToken(data.accessToken);
+  return response;
 };
