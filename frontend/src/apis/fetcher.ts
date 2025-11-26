@@ -84,7 +84,7 @@ const fetchRequest = ({
   if (accessToken) {
     finalHeaders.set('Authorization', `Bearer ${accessToken}`);
   }
-  console.log(accessToken);
+
   return fetch(buildUrl(url, params), {
     method,
     body: body ? JSON.stringify(body) : undefined,

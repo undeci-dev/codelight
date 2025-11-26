@@ -37,3 +37,16 @@ export interface ExceptionResponse {
   codeLightCode: string | number;
   message: string;
 }
+
+export interface KakaoLoginRequest {
+  code: string;
+}
+
+export interface KakaoLoginResponse {
+  userId: number;
+  email: string;
+  name?: string;
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}

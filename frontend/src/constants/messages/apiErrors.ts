@@ -4,6 +4,7 @@ export const API_ERRORS: Record<string, string> = {
   AUTH_TOKEN_EMPTY: '로그인 후 이용 가능합니다.\n 로그인을 진행해 주세요.',
   AUTH_TOKEN_INVALID: '로그인 후 이용 가능합니다.\n 로그인을 진행해 주세요.',
   TOKEN_EXPIRED: '로그인 후 이용 가능합니다.\n 로그인을 진행해 주세요.',
+  USER_INVALID_PASSWORD: '비밀번호가 틀렸습니다.\n 다시 입력해 주세요.',
   USER_ACCOUNT_DELETED:
     '탈퇴한 사용자입니다.\n 다른 아이디로 로그인을 진행해 주세요.',
   USER_NOT_FOUND: '사용자를 찾을 수 없어요.\n 다시 확인해 주세요.',
