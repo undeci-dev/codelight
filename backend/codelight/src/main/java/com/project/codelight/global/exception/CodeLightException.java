@@ -22,4 +22,8 @@ public class CodeLightException extends RuntimeException {
     public String getExceptionCodeName() {
         return exceptionCodeType.getExceptionCode().name();
     }
+
+    public ExceptionCodeType getExceptionCodeType() {
+        return exceptionCodeType;
+    }
 }
