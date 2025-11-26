@@ -89,7 +89,7 @@ public class WebSecurityConfig {
 
     @Bean
     public CustomAuthFailureHandler customLoginFailureHandler() {
-        return new CustomAuthFailureHandler();
+        return new CustomAuthFailureHandler(objectMapper);
     }
 
     @Bean
