@@ -5,6 +5,7 @@ import { ROUTE_PATH } from '@/constants/routhPath';
 const MainPage = React.lazy(() => import('@/pages/MainPage'));
 const SignUpPage = React.lazy(() => import('@/pages/SignUpPage'));
 const SignInPage = React.lazy(() => import('@/pages/SignInPage'));
+const KakaoCallbackPage = React.lazy(() => import('@/pages/KakaoCallbackPage'));
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         element: <SignInPage />,
         path: ROUTE_PATH.signIn,
+      },
+      {
+        element: <KakaoCallbackPage />,
+        path: ROUTE_PATH.kakaoCallback,
       },
       {
         element: <MainPage />,

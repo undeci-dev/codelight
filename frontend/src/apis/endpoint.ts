@@ -7,7 +7,7 @@ export const ENDPOINT = {
   SIGN_IN: '/api/local-auth/login',
   LOG_OUT: '/api/local-auth/logout',
   TOKEN_REFRESH: '/api/token/refresh',
-  OAUTH_LOGIN: '/api/oauth/login',
+  OAUTH_LOGIN: '/api/oauth/kakao/login',
   MYPAGE_INFO: '/api/mypage',
   ACCOUNT_DELETE: '/api/withdraw',
   NOTIFICATION: '/api/notification',

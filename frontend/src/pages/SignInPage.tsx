@@ -9,6 +9,7 @@ import useSignInMutation from '@/hooks/useSignInMutation';
 import useValidateInput from '@/hooks/useValidateInput';
 import logo from '@/assets/images/common/codelight-logo.svg';
 import { validateEmail, validatePassword } from '@/utils/authValidation';
+import { getKakaoAuthUrl } from '@/constants/oauth';
 
 const SignInPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,7 +39,7 @@ const SignInPage = () => {
 
   const { mutate } = useSignInMutation();
 
-  const handleSubmit = () => {
+  const handleSignIn = () => {
     mutate(
       { email, password },
       {
@@ -59,8 +60,12 @@ const SignInPage = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' && !disabled) {
-      handleSubmit();
+      handleSignIn();
     }
+  };
+
+  const handleKakaoLogin = () => {
+    window.location.href = getKakaoAuthUrl();
   };
 
   return (
@@ -94,9 +99,24 @@ const SignInPage = () => {
             label='로그인'
             variant='primary'
             fullWidth
-            onClick={handleSubmit}
+            onClick={handleSignIn}
             disabled={disabled}
           />
+          <div className='my-4 flex items-center gap-2'>
+            <div className='h-px flex-1 bg-gray-300' />
+            <Text typography='body2' color='gray600'>
+              또는
+            </Text>
+            <div className='h-px flex-1 bg-gray-300' />
+          </div>
+          <button
+            onClick={handleKakaoLogin}
+            className='flex w-full items-center justify-center gap-2 rounded-lg bg-[#FEE500] px-4 py-3 transition-opacity hover:opacity-90'
+          >
+            <Text typography='body1' color='gray900' className='font-semibold'>
+              Kakao 로그인
+            </Text>
+          </button>
         </div>
         <Text
           typography='body1'

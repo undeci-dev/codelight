@@ -13,7 +13,7 @@ const MainPage = () => {
 
   const { mutate } = useLogOutMutation();
 
-  const handleSubmit = () => {
+  const handleLogOut = () => {
     mutate(undefined, {
       onSuccess: () => {
         setTimeout(() => {
@@ -38,7 +38,7 @@ const MainPage = () => {
           label='로그아웃'
           variant='primary'
           fullWidth
-          onClick={handleSubmit}
+          onClick={handleLogOut}
         />
       </div>
     </>
