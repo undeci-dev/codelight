@@ -2,7 +2,7 @@ package com.project.codelight.auth.controller;
 
 import com.project.codelight.auth.dto.request.SignUpRequest;
 import com.project.codelight.auth.dto.response.ReissueTokenResponse;
-import com.project.codelight.auth.service.AuthService;
+import com.project.codelight.auth.service.LocalAuthService;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
@@ -20,20 +20,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-public class AuthController {
+public class LocalAuthController {
 
-    private final AuthService authService;
+    private final LocalAuthService localAuthService;
 
     @PostMapping("/api/local-auth/register")
     public ResponseEntity<Void> register(@Valid @RequestBody SignUpRequest request) {
-        Long userId = authService.register(request);
+        Long userId = localAuthService.register(request);
         return ResponseEntity.created(URI.create("/api/local-auth/register/" + userId)).build();
     }
 
     @PostMapping("/api/local-auth/token")
     public ResponseEntity<Void> reissueToken(HttpServletRequest request) {
         String beforeRefreshToken = extractRefreshTokenFromCookie(request);
-        ReissueTokenResponse newReissueTokenResponse = authService.reissueToken(beforeRefreshToken);
+        ReissueTokenResponse newReissueTokenResponse = localAuthService.reissueToken(
+            beforeRefreshToken);
         String newAccessToken = newReissueTokenResponse.getAccessToken();
         String newRefreshToken = newReissueTokenResponse.getRefreshToken();
 
@@ -63,8 +64,8 @@ public class AuthController {
         if (headerToken != null) {
             String accessToken = TokenUtils.getHeaderToToken(headerToken);
             if (accessToken != null) {
-                authService.addTokenBlackList(accessToken);
-                authService.removeRefreshToken(accessToken);
+                localAuthService.addTokenBlackList(accessToken);
+                localAuthService.removeRefreshToken(accessToken);
             } else {
                 throw new CodeLightException(ExceptionCodeType.TOKEN_NOT_FOUND);
             }
