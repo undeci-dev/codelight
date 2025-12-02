@@ -14,10 +14,12 @@ import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LocalAuthService {
@@ -106,7 +108,7 @@ public class LocalAuthService {
 
         return ReissueTokenResponse.builder()
                                    .userId(Long.valueOf(userId))
-                                   .accessToken(newAccessToken)
+                                   .accessToken("Bearer " + newAccessToken)
                                    .refreshToken(newRefreshToken)
                                    .build();
     }

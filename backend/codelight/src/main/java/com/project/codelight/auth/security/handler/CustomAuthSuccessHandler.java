@@ -8,7 +8,6 @@ import com.project.codelight.auth.security.model.CustomUserDetails;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import com.project.codelight.user.domain.User;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -40,19 +40,18 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
 
         if (user.isDeleted()) {
             responseMap.put("status", HttpStatus.FORBIDDEN.value());
-            responseMap.put("accessToken", null);
-            responseMap.put("refreshToken", null);
             responseMap.put("codeLightCode", ExceptionCodeType.USER_ACCOUNT_DELETED);
         } else {
             String accessToken = TokenUtils.generateAccessToken(user);
             String refreshToken = TokenUtils.generateRefreshToken(user);
 
+            response.setHeader("Authorization", "Bearer " + accessToken);
+
             responseMap.put("status", HttpStatus.OK.value());
-            responseMap.put("accessToken", accessToken);
             responseMap.put("codeLightCode", null);
 
-            Cookie refreshCookie = TokenUtils.createRefreshTokenCookie(refreshToken);
-            response.addCookie(refreshCookie);
+            ResponseCookie refreshCookie = TokenUtils.createRefreshTokenCookie(refreshToken);
+            response.addHeader("Set-Cookie", refreshCookie.toString());
 
             // Redis에 RefreshToken 저장
             RefreshToken redisRefreshToken = RefreshToken.builder()
