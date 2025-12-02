@@ -60,7 +60,6 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
                                                          .expiration(TokenExpiration.REFRESH_TOKEN.getExpirationInSeconds())
                                                          .build();
             refreshTokenRepository.save(redisRefreshToken);
-            log.info("Refresh token saved : {}", refreshToken);
         }
 
         response.setCharacterEncoding("UTF-8");
