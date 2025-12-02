@@ -107,17 +107,17 @@ public enum ExceptionCodeType {
     S3_PRESIGNED_URL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionCode.S3_PRESIGNED_URL_ERROR,
         "Pre-signed URL 생성에 실패했습니다."),
 
-    // ========== 피드 (FEED) ==========
-    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, ExceptionCode.FEED_NOT_FOUND, "피드를 찾을 수 없습니다."),
-    FEED_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, ExceptionCode.FEED_CONTENT_REQUIRED,
+    // ========== 피드 (POST) ==========
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, ExceptionCode.POST_NOT_FOUND, "피드를 찾을 수 없습니다."),
+    POST_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, ExceptionCode.POST_CONTENT_REQUIRED,
         "피드 내용은 필수입니다."),
-    FEED_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, ExceptionCode.FEED_CONTENT_TOO_LONG,
+    POST_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, ExceptionCode.POST_CONTENT_TOO_LONG,
         "피드 내용은 최대 500자까지 입력 가능합니다."),
-    FEED_NOT_OWNED_BY_USER(HttpStatus.FORBIDDEN, ExceptionCode.FEED_NOT_OWNED_BY_USER,
+    POST_NOT_OWNED_BY_USER(HttpStatus.FORBIDDEN, ExceptionCode.POST_NOT_OWNED_BY_USER,
         "본인이 작성한 피드가 아닙니다."),
-    FEED_ALREADY_DELETED(HttpStatus.BAD_REQUEST, ExceptionCode.FEED_ALREADY_DELETED,
+    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, ExceptionCode.POST_ALREADY_DELETED,
         "이미 삭제된 피드입니다."),
-    FEED_INVALID_CURSOR(HttpStatus.BAD_REQUEST, ExceptionCode.FEED_INVALID_CURSOR,
+    POST_INVALID_CURSOR(HttpStatus.BAD_REQUEST, ExceptionCode.POST_INVALID_CURSOR,
         "유효하지 않은 커서입니다."),
 
     // 링크 프리뷰
@@ -129,12 +129,14 @@ public enum ExceptionCodeType {
         "링크 프리뷰 요청 시간이 초과되었습니다."),
 
     // 파일 첨부
-    FEED_FILE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, ExceptionCode.FEED_FILE_COUNT_EXCEEDED,
+    POST_FILE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, ExceptionCode.POST_FILE_COUNT_EXCEEDED,
         "첨부 파일은 최대 4개까지 가능합니다."),
     GIF_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, ExceptionCode.GIF_SIZE_EXCEEDED,
         "GIF 파일은 최대 10MB까지 가능합니다."),
     GIF_FRAME_EXCEEDED(HttpStatus.BAD_REQUEST, ExceptionCode.GIF_FRAME_EXCEEDED,
         "GIF 프레임 수가 너무 많습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionCode.FILE_UPLOAD_FAILED,
+        "파일 업로드에 실패했습니다."),
 
     // 리액션/상호작용
     EMOJI_INVALID(HttpStatus.BAD_REQUEST, ExceptionCode.EMOJI_INVALID, "유효하지 않은 이모지입니다."),

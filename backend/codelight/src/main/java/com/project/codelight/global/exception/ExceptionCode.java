@@ -69,13 +69,13 @@ public enum ExceptionCode {
     IMAGE_UPLOAD_FAILED,
     S3_PRESIGNED_URL_ERROR,
 
-    // ========== 피드 (FEED) ==========
-    FEED_NOT_FOUND,
-    FEED_CONTENT_REQUIRED,
-    FEED_CONTENT_TOO_LONG,
-    FEED_NOT_OWNED_BY_USER,
-    FEED_ALREADY_DELETED,
-    FEED_INVALID_CURSOR,
+    // ========== 피드 (POST) ==========
+    POST_NOT_FOUND,
+    POST_CONTENT_REQUIRED,
+    POST_CONTENT_TOO_LONG,
+    POST_NOT_OWNED_BY_USER,
+    POST_ALREADY_DELETED,
+    POST_INVALID_CURSOR,
 
     // 링크 프리뷰
     LINK_PREVIEW_FETCH_FAILED,
@@ -83,9 +83,10 @@ public enum ExceptionCode {
     LINK_PREVIEW_TIMEOUT,
 
     // 파일 첨부
-    FEED_FILE_COUNT_EXCEEDED,
+    POST_FILE_COUNT_EXCEEDED,
     GIF_SIZE_EXCEEDED,
     GIF_FRAME_EXCEEDED,
+    FILE_UPLOAD_FAILED,
 
     // 리액션/상호작용
     EMOJI_INVALID,
