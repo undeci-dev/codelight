@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class KakaoUserInfoResponse {
 
     @JsonProperty("id")
-    private Long id;
+    private Long userId;
 
     @JsonProperty("connected_at")
     private String connectedAt;

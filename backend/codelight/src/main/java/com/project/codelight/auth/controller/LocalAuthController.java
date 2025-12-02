@@ -8,11 +8,13 @@ import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,16 +33,18 @@ public class LocalAuthController {
     }
 
     @PostMapping("/api/local-auth/token")
-    public ResponseEntity<Void> reissueToken(HttpServletRequest request) {
+    public ResponseEntity<Void> reissueToken(HttpServletRequest request,
+                                             HttpServletResponse response) {
         String beforeRefreshToken = extractRefreshTokenFromCookie(request);
         ReissueTokenResponse newReissueTokenResponse = localAuthService.reissueToken(
             beforeRefreshToken);
         String newAccessToken = newReissueTokenResponse.getAccessToken();
         String newRefreshToken = newReissueTokenResponse.getRefreshToken();
 
+        ResponseCookie refreshCookie = TokenUtils.createRefreshTokenCookie(newRefreshToken);
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
         return ResponseEntity.ok()
-                             .header(HttpHeaders.SET_COOKIE,
-                                 TokenUtils.createRefreshTokenCookie(newRefreshToken).toString())
                              .header(HttpHeaders.AUTHORIZATION, newAccessToken)
                              .build();
     }
@@ -59,7 +63,8 @@ public class LocalAuthController {
     }
 
     @PostMapping("/api/local-auth/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
+    public ResponseEntity<Void> logout(HttpServletRequest request,
+                                       HttpServletResponse response) {
         String headerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (headerToken != null) {
             String accessToken = TokenUtils.getHeaderToToken(headerToken);
@@ -72,7 +77,10 @@ public class LocalAuthController {
         } else {
             throw new CodeLightException(ExceptionCodeType.TOKEN_NOT_FOUND);
         }
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-            TokenUtils.clearRefreshTokenCookie().toString()).build();
+
+        ResponseCookie refreshCookie = TokenUtils.clearRefreshTokenCookie();
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        return ResponseEntity.ok().build();
     }
 }

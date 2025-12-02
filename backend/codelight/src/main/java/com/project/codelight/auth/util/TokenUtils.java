@@ -10,7 +10,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -106,32 +106,34 @@ public class TokenUtils {
         return c.getTime();
     }
 
-    public static Cookie createRefreshTokenCookie(String refreshToken) {
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setMaxAge((int) TokenExpiration.REFRESH_TOKEN.getExpirationInSeconds());
-        refreshCookie.setHttpOnly(true);
-
-        return refreshCookie;
+    public static ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+                             .maxAge(TokenExpiration.REFRESH_TOKEN.getExpirationInSeconds())
+//                             .httpOnly(true) // 개발용(임시)
+                             .path("/")
+                             .sameSite("Lax")  // 개발용(임시)
+                             .secure(false)     // 개발용(임시)
+                             // .secure(true)  // 개발용(임시) - HTTPS 적용 후 풀기
+                             .build();
     }
 
-    public static Cookie clearRefreshTokenCookie() {
-        Cookie refreshCookie = new Cookie("refreshToken", null);
-        refreshCookie.setMaxAge(0);
-        refreshCookie.setHttpOnly(true);
-
-        return refreshCookie;
+    public static ResponseCookie clearRefreshTokenCookie() {
+        return ResponseCookie.from("refreshToken", null)
+                             .maxAge(0)
+//                             .httpOnly(true) // 개발용(임시)
+                             .path("/")
+                             .sameSite("Lax")  // 개발용(임시)
+                             .secure(false)     // 개발용(임시)
+                             // .secure(true)  // 개발용(임시) - HTTPS 적용 후 풀기
+                             .build();
     }
 
-    public static User getClaimsToUserDto(String token, boolean isAccessToken) {
+    public static User getClaimsToUserDto(String token) {
         Claims claims = getTokenToClaims(token);
         Long userId = Long.valueOf(claims.get("id").toString());
-        if (isAccessToken) {
-            String userNm = claims.get("name").toString();
-            String email = claims.get("email").toString();
-            return User.builder().id(userId).name(userNm).email(email).build();
-        } else {
-            return User.builder().id(userId).build();
-        }
+        String userNm = claims.get("name").toString();
+        String email = claims.get("email").toString();
+        return User.builder().id(userId).name(userNm).email(email).build();
     }
 
     public static long getClaimsToTTL(String token) {

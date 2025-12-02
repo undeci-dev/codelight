@@ -1,10 +1,12 @@
 package com.project.codelight.auth.security.filter;
 
 import com.project.codelight.auth.repository.TokenBlackListRepository;
+import com.project.codelight.auth.security.model.CustomUserDetails;
 import com.project.codelight.auth.service.model.TokenValidationResult;
 import com.project.codelight.auth.util.TokenUtils;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
+import com.project.codelight.user.domain.User;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,10 +14,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -58,6 +63,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                         if (tokenBlackListRepository.existsById(paramAccessToken)) {
                             throw new CodeLightException(ExceptionCodeType.TOKEN_BLACKLISTED);
                         }
+
+                        User user = TokenUtils.getClaimsToUserDto(paramAccessToken);
+                        CustomUserDetails userDetails = new CustomUserDetails(user,
+                            Collections.emptyList());
+                        UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null,
+                                userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
 
                         chain.doFilter(request, response);
                     } else {

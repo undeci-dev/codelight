@@ -52,17 +52,17 @@ public class OAuthService {
         saveRefreshToken(user.getId(), refreshToken);
 
         return KakaoLoginResponse.builder()
-            .userId(user.getId())
-            .email(user.getEmail())
-            .name(user.getName())
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .isNewUser(user.getCreatedAt().equals(user.getUpdatedAt()))
-            .build();
+                                 .userId(user.getId())
+                                 .email(user.getEmail())
+                                 .name(user.getName())
+                                 .accessToken("Bearer " + accessToken)
+                                 .refreshToken(refreshToken)
+                                 .isNewUser(user.getCreatedAt().equals(user.getUpdatedAt()))
+                                 .build();
     }
 
     private User processOAuthUser(KakaoUserInfoResponse userInfo, KakaoTokenResponse tokenResponse) {
-        String providerUserId = String.valueOf(userInfo.getId());
+        String providerUserId = String.valueOf(userInfo.getUserId());
         OAuthProvider provider = OAuthProvider.KAKAO;
 
         return oauthAccountRepository.findByProviderAndProviderUserId(provider, providerUserId)
