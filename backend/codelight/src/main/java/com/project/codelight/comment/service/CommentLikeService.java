@@ -1,11 +1,11 @@
 package com.project.codelight.comment.service;
 
+import com.project.codelight.comment.domain.Comment;
+import com.project.codelight.comment.domain.CommentLike;
 import com.project.codelight.comment.repository.CommentLikeRepository;
 import com.project.codelight.comment.repository.CommentRepository;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
-import com.project.codelight.post.domain.Comment;
-import com.project.codelight.post.domain.CommentLike;
 import com.project.codelight.user.domain.User;
 import java.util.HashSet;
 import java.util.List;

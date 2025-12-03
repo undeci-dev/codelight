@@ -1,6 +1,6 @@
 package com.project.codelight.poll.repository;
 
-import com.project.codelight.post.domain.Poll;
+import com.project.codelight.poll.domain.Poll;
 import com.project.codelight.post.domain.Post;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -2,13 +2,13 @@ package com.project.codelight.poll.service;
 
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
+import com.project.codelight.poll.domain.Poll;
+import com.project.codelight.poll.domain.PollOption;
+import com.project.codelight.poll.domain.PollVote;
 import com.project.codelight.poll.dto.request.PollCreateRequest;
 import com.project.codelight.poll.repository.PollOptionRepository;
 import com.project.codelight.poll.repository.PollRepository;
 import com.project.codelight.poll.repository.PollVoteRepository;
-import com.project.codelight.post.domain.Poll;
-import com.project.codelight.post.domain.PollOption;
-import com.project.codelight.post.domain.PollVote;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.user.domain.User;
 import java.time.LocalDateTime;

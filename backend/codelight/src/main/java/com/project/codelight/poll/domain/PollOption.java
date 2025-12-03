@@ -1,4 +1,4 @@
-package com.project.codelight.post.domain;
+package com.project.codelight.poll.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 

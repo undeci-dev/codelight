@@ -1,8 +1,8 @@
 package com.project.codelight.poll.repository;
 
-import com.project.codelight.post.domain.Poll;
-import com.project.codelight.post.domain.PollOption;
-import com.project.codelight.post.domain.PollVote;
+import com.project.codelight.poll.domain.Poll;
+import com.project.codelight.poll.domain.PollOption;
+import com.project.codelight.poll.domain.PollVote;
 import com.project.codelight.user.domain.User;
 import java.util.List;
 import java.util.Optional;

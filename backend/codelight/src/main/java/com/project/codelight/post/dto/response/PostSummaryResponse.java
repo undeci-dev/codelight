@@ -1,7 +1,7 @@
 package com.project.codelight.post.dto.response;
 
+import com.project.codelight.poll.domain.Poll;
 import com.project.codelight.poll.dto.response.PollResponse;
-import com.project.codelight.post.domain.Poll;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.post.domain.PostFile;
 import java.time.LocalDateTime;

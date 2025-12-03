@@ -15,10 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.codelight.auth.security.model.CustomUserDetails;
+import com.project.codelight.poll.domain.Poll;
+import com.project.codelight.poll.domain.PollOption;
 import com.project.codelight.poll.dto.request.PollVoteRequest;
 import com.project.codelight.poll.service.PollService;
-import com.project.codelight.post.domain.Poll;
-import com.project.codelight.post.domain.PollOption;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;

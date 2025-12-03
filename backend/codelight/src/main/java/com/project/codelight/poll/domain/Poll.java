@@ -1,7 +1,8 @@
-package com.project.codelight.post.domain;
+package com.project.codelight.poll.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.project.codelight.post.domain.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

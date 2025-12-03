@@ -1,6 +1,6 @@
 package com.project.codelight.poll.dto.request;
 
-import com.project.codelight.post.domain.PollOption;
+import com.project.codelight.poll.domain.PollOption;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

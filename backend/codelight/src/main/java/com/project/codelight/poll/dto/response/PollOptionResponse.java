@@ -1,6 +1,6 @@
 package com.project.codelight.poll.dto.response;
 
-import com.project.codelight.post.domain.PollOption;
+import com.project.codelight.poll.domain.PollOption;
 
 public record PollOptionResponse(
     Long optionId,

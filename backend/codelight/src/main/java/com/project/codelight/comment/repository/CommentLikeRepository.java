@@ -1,7 +1,7 @@
 package com.project.codelight.comment.repository;
 
-import com.project.codelight.post.domain.Comment;
-import com.project.codelight.post.domain.CommentLike;
+import com.project.codelight.comment.domain.Comment;
+import com.project.codelight.comment.domain.CommentLike;
 import com.project.codelight.user.domain.User;
 import java.util.List;
 import java.util.Optional;

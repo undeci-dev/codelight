@@ -3,6 +3,7 @@ package com.project.codelight.post.domain;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.project.codelight.BaseEntity;
+import com.project.codelight.poll.domain.Poll;
 import com.project.codelight.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
