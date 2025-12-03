@@ -27,4 +27,11 @@ public abstract class BaseEntity {
         return deleted;
     }
 
+    public void softDelete() {
+        this.deleted = true;
+    }
+
+    public void restore() {
+        this.deleted = false;
+    }
 }
