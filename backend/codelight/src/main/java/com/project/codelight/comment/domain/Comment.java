@@ -1,8 +1,9 @@
-package com.project.codelight.post.domain;
+package com.project.codelight.comment.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
 import com.project.codelight.BaseEntity;
+import com.project.codelight.post.domain.Post;
 import com.project.codelight.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

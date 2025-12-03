@@ -18,11 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.codelight.auth.security.model.CustomUserDetails;
+import com.project.codelight.comment.domain.Comment;
 import com.project.codelight.comment.dto.request.CommentCreateRequest;
 import com.project.codelight.comment.dto.request.CommentUpdateRequest;
 import com.project.codelight.comment.service.CommentLikeService;
 import com.project.codelight.comment.service.CommentService;
-import com.project.codelight.post.domain.Comment;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;

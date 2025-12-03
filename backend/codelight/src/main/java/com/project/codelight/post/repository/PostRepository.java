@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @EntityGraph(attributePaths = {"files, links"})
-    @Query("SELECT p FROM Post p WHERE p.deleted = false ORDER BY p.createdAt DESC")
+    @EntityGraph(attributePaths = {"files", "links", "poll"})
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false ORDER BY p.createdAt DESC")
     List<Post> findActivePosts();
 
     @Query("SELECT p FROM Post p WHERE p.user = :user AND p.deleted = false ORDER BY p.createdAt DESC")
@@ -32,7 +32,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByIdAndUserAndDeletedFalse(Long id, User user);
 
-    @EntityGraph(attributePaths = {"files, links"})
-    @Query("SELECT p FROM Post p WHERE p.id = :postId AND p.deleted = false ORDER BY p.createdAt DESC")
-    Optional<Post> findByIdAndDeletedFalse(Long postId);
+    @EntityGraph(attributePaths = {"files", "links", "poll"})
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.id = :postId AND p.deleted = false")
+    Optional<Post> findByIdAndDeletedFalse(@Param("postId") Long postId);
 }

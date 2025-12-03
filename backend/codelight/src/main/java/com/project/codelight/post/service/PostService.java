@@ -2,6 +2,8 @@ package com.project.codelight.post.service;
 
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
+import com.project.codelight.poll.dto.request.PollCreateRequest;
+import com.project.codelight.poll.service.PollService;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.post.domain.PostFile;
 import com.project.codelight.post.dto.request.PostCreateRequest.FileInfo;
@@ -21,6 +23,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostFileRepository postFileRepository;
+    private final PollService pollService;
 
     public List<Post> getActivePosts() {
         return postRepository.findActivePosts();
@@ -37,6 +40,23 @@ public class PostService {
         if (files != null && !files.isEmpty()) {
             List<PostFile> postFiles = createPostFiles(savedPost, files);
             postFileRepository.saveAll(postFiles);
+        }
+
+        return savedPost;
+    }
+
+    @Transactional
+    public Post createPostWithFilesAndPoll(Post post, List<FileInfo> files,
+                                           PollCreateRequest pollRequest) {
+        Post savedPost = postRepository.save(post);
+
+        if (files != null && !files.isEmpty()) {
+            List<PostFile> postFiles = createPostFiles(savedPost, files);
+            postFileRepository.saveAll(postFiles);
+        }
+
+        if (pollRequest != null) {
+            pollService.createPoll(savedPost, pollRequest);
         }
 
         return savedPost;
@@ -67,6 +87,8 @@ public class PostService {
         Post post = postRepository.findByIdAndUserAndDeletedFalse(postId, user)
                                   .orElseThrow(() -> new CodeLightException(
                                       ExceptionCodeType.POST_NOT_FOUND));
+
+        pollService.deletePollByPost(post);
         postFileRepository.deleteAllByPost(post);
         postRepository.softDeletePostById(postId);
     }
@@ -77,7 +99,8 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePostContent(Long postId, String newContent, List<FileInfo> files, User user) {
+    public void updatePostContent(Long postId, String newContent, List<FileInfo> files,
+                                  PollCreateRequest pollRequest, User user) {
         Post post = postRepository.findByIdAndUserAndDeletedFalse(postId, user)
                                   .orElseThrow(() -> new CodeLightException(
                                       ExceptionCodeType.POST_NOT_FOUND));
@@ -88,6 +111,12 @@ public class PostService {
         if (files != null && !files.isEmpty()) {
             List<PostFile> postFiles = createPostFiles(post, files);
             postFileRepository.saveAll(postFiles);
+        }
+
+        // 기존 poll 삭제 후 새 poll 저장
+        pollService.deletePollByPost(post);
+        if (pollRequest != null) {
+            pollService.createPoll(post, pollRequest);
         }
     }
 }

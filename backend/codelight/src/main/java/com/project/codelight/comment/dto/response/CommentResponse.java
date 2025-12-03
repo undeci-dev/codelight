@@ -1,6 +1,6 @@
 package com.project.codelight.comment.dto.response;
 
-import com.project.codelight.post.domain.Comment;
+import com.project.codelight.comment.domain.Comment;
 import java.time.LocalDateTime;
 import java.util.List;
 

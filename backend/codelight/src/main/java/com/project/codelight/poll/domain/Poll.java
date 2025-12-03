@@ -1,8 +1,8 @@
-package com.project.codelight.post.domain;
+package com.project.codelight.poll.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
-import com.project.codelight.BaseEntity;
+import com.project.codelight.post.domain.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,9 +10,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,14 +24,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 @Entity
 @Table(name = "polls")
-public class Poll extends BaseEntity {
+public class Poll {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "poll_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false, unique = true)
     private Post post;
 
@@ -43,6 +46,9 @@ public class Poll extends BaseEntity {
 
     @Column(name = "total_votes")
     private Integer totalVotes;
+
+    @OneToMany(mappedBy = "poll", fetch = FetchType.LAZY)
+    private List<PollOption> options = new ArrayList<>();
 
     @Builder
     private Poll(Post post,
@@ -59,6 +65,11 @@ public class Poll extends BaseEntity {
 
     public void updateQuestion(String question) {
         this.question = question;
+    }
+
+    public void update(String question, LocalDateTime endsAt) {
+        this.question = question;
+        this.endsAt = endsAt;
     }
 
     public void incrementVotes() {

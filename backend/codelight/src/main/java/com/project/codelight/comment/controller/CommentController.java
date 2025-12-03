@@ -1,6 +1,7 @@
 package com.project.codelight.comment.controller;
 
 import com.project.codelight.auth.security.model.CustomUserDetails;
+import com.project.codelight.comment.domain.Comment;
 import com.project.codelight.comment.dto.request.CommentCreateRequest;
 import com.project.codelight.comment.dto.request.CommentUpdateRequest;
 import com.project.codelight.comment.dto.response.CommentResponse;
@@ -9,14 +10,12 @@ import com.project.codelight.comment.service.CommentLikeService;
 import com.project.codelight.comment.service.CommentService;
 import com.project.codelight.global.exception.CodeLightException;
 import com.project.codelight.global.exception.ExceptionCodeType;
-import com.project.codelight.post.domain.Comment;
 import com.project.codelight.user.domain.User;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

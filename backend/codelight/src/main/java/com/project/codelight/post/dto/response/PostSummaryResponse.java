@@ -1,5 +1,7 @@
 package com.project.codelight.post.dto.response;
 
+import com.project.codelight.poll.domain.Poll;
+import com.project.codelight.poll.dto.response.PollResponse;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.post.domain.PostFile;
 import java.time.LocalDateTime;
@@ -16,7 +18,8 @@ public record PostSummaryResponse(
     int sharesCount,
     LocalDateTime createdAt,
     List<String> fileUrls,
-    boolean liked
+    boolean liked,
+    PollResponse poll
 ) {
 
     public static PostSummaryResponse from(Post post, boolean liked) {
@@ -27,6 +30,11 @@ public record PostSummaryResponse(
                        .map(PostFile::getFileUrl)
                        .toList()
             : List.of();
+
+        Poll poll = post.getPoll();
+        PollResponse pollResponse = poll != null
+            ? PollResponse.from(poll, poll.getOptions())
+            : null;
 
         return new PostSummaryResponse(
             post.getId(),
@@ -39,7 +47,8 @@ public record PostSummaryResponse(
             post.getSharesCount(),
             post.getCreatedAt(),
             fileUrls,
-            liked
+            liked,
+            pollResponse
         );
     }
 }
