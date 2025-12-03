@@ -166,6 +166,12 @@ public enum ExceptionCodeType {
     POLL_MULTIPLE_VOTE_NOT_ALLOWED(HttpStatus.BAD_REQUEST,
         ExceptionCode.POLL_MULTIPLE_VOTE_NOT_ALLOWED,
         "단일 선택 투표에서는 하나의 옵션만 선택 가능합니다."),
+    POLL_ALREADY_VOTED(HttpStatus.BAD_REQUEST, ExceptionCode.POLL_ALREADY_VOTED,
+        "이미 투표가 진행된 투표는 수정할 수 없습니다."),
+    POLL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, ExceptionCode.POLL_ALREADY_EXISTS,
+        "이미 투표가 존재합니다."),
+    UNAUTHORIZED(HttpStatus.FORBIDDEN, ExceptionCode.UNAUTHORIZED,
+        "해당 리소스에 대한 권한이 없습니다."),
 
     // ========== 발표 (PRESENTATION) ==========
     // 일정
