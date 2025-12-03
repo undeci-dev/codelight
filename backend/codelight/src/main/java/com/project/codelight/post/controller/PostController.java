@@ -75,7 +75,15 @@ public class PostController {
                            .user(user)
                            .content(request.content())
                            .build();
-        Post saved = postService.createPostWithFiles(newPost, request.files());
+
+        Post saved;
+        if (request.poll() != null) {
+            saved = postService.createPostWithFilesAndPoll(newPost, request.files(),
+                request.poll());
+        } else {
+            saved = postService.createPostWithFiles(newPost, request.files());
+        }
+
         return ResponseEntity.created(URI.create("/api/posts/" + saved.getId())).build();
     }
 
@@ -84,7 +92,8 @@ public class PostController {
                                            @Valid @RequestBody PostUpdateRequest request,
                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userDetails.getUser();
-        postService.updatePostContent(postId, request.content(), request.files(), user);
+        postService.updatePostContent(postId, request.content(), request.files(), request.poll(),
+            user);
         return ResponseEntity.noContent().build();
     }
 

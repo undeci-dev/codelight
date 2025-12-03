@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -56,6 +57,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private Set<PostLink> links = new HashSet<>();
+
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
+    private Poll poll;
 
     @Builder
     private Post(User user,
