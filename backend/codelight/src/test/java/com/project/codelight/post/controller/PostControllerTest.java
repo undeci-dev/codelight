@@ -173,7 +173,8 @@ class PostControllerTest {
         void createPostSuccess() throws Exception {
             PostCreateRequest request = new PostCreateRequest(
                 "새로운 게시글 내용",
-                List.of(new FileInfo("https://s3.example.com/file.jpg", "file.jpg", 1024L))
+                List.of(new FileInfo("https://s3.example.com/file.jpg", "file.jpg", 1024L)),
+                null
             );
 
             Post savedPost = Post.builder()
@@ -197,7 +198,7 @@ class PostControllerTest {
         @DisplayName("내용이 비어있으면 400을 반환한다")
         @WithMockUser
         void createPostWithEmptyContent() throws Exception {
-            PostCreateRequest request = new PostCreateRequest("", null);
+            PostCreateRequest request = new PostCreateRequest("", null, null);
 
             mockMvc.perform(post("/api/post")
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
@@ -211,7 +212,7 @@ class PostControllerTest {
         @Test
         @DisplayName("비로그인 사용자는 게시글을 생성할 수 없다")
         void createPostUnauthorized() throws Exception {
-            PostCreateRequest request = new PostCreateRequest("새로운 게시글", null);
+            PostCreateRequest request = new PostCreateRequest("새로운 게시글", null, null);
 
             mockMvc.perform(post("/api/post")
                        .with(SecurityMockMvcRequestPostProcessors.anonymous())
@@ -231,9 +232,9 @@ class PostControllerTest {
         @DisplayName("게시글을 성공적으로 수정한다")
         @WithMockUser
         void updatePostSuccess() throws Exception {
-            PostUpdateRequest request = new PostUpdateRequest("수정된 내용", Collections.emptyList());
+            PostUpdateRequest request = new PostUpdateRequest("수정된 내용", Collections.emptyList(), null);
 
-            doNothing().when(postService).updatePostContent(anyLong(), any(), anyList(), any(User.class));
+            doNothing().when(postService).updatePostContent(anyLong(), any(), anyList(), any(), any(User.class));
 
             mockMvc.perform(put("/api/post/{postId}", 1L)
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
@@ -243,14 +244,14 @@ class PostControllerTest {
                    .andDo(print())
                    .andExpect(status().isNoContent());
 
-            verify(postService).updatePostContent(eq(1L), eq("수정된 내용"), anyList(), any(User.class));
+            verify(postService).updatePostContent(eq(1L), eq("수정된 내용"), anyList(), any(), any(User.class));
         }
 
         @Test
         @DisplayName("수정할 내용이 비어있으면 400을 반환한다")
         @WithMockUser
         void updatePostWithEmptyContent() throws Exception {
-            PostUpdateRequest request = new PostUpdateRequest("", null);
+            PostUpdateRequest request = new PostUpdateRequest("", null, null);
 
             mockMvc.perform(put("/api/post/{postId}", 1L)
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
