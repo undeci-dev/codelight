@@ -1,6 +1,8 @@
 package com.project.codelight.post.dto.response;
 
 import com.project.codelight.auth.security.model.CustomUserDetails;
+import com.project.codelight.poll.dto.response.PollResponse;
+import com.project.codelight.post.domain.Poll;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.post.domain.PostFile;
 import java.time.LocalDateTime;
@@ -19,7 +21,8 @@ public record PostDetailResponse(
     LocalDateTime createdAt,
     List<String> fileUrls,
     boolean isOwner,
-    boolean liked
+    boolean liked,
+    PollResponse poll
 ) {
 
     public static PostDetailResponse from(Post post, CustomUserDetails userDetails, boolean liked) {
@@ -36,6 +39,11 @@ public record PostDetailResponse(
             && post.getUser() != null
             && post.getUser().getId().equals(userDetails.getUser().getId());
 
+        Poll poll = post.getPoll();
+        PollResponse pollResponse = poll != null
+            ? PollResponse.from(poll, poll.getOptions())
+            : null;
+
         return new PostDetailResponse(
             post.getId(),
             post.getUser().getId(),
@@ -47,7 +55,8 @@ public record PostDetailResponse(
             post.getCreatedAt(),
             fileUrls,
             isOwner,
-            liked
+            liked,
+            pollResponse
         );
     }
 }
