@@ -9,8 +9,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,16 +18,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.codelight.auth.security.model.CustomUserDetails;
+import com.project.codelight.global.config.CloudFrontProperties;
+import com.project.codelight.poll.service.PollService;
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.post.dto.request.PostCreateRequest;
-import com.project.codelight.post.dto.request.PostCreateRequest.FileInfo;
 import com.project.codelight.post.dto.request.PostUpdateRequest;
 import com.project.codelight.post.service.PostLikeService;
 import com.project.codelight.post.service.PostService;
 import com.project.codelight.user.domain.LoginType;
 import com.project.codelight.user.domain.User;
 import com.project.codelight.user.domain.UserRole;
-import java.util.Collections;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,6 +62,12 @@ class PostControllerTest {
 
     @MockitoBean
     private PostLikeService postLikeService;
+
+    @MockitoBean
+    private PollService pollService;
+
+    @MockitoBean
+    private CloudFrontProperties cloudFrontProperties;
 
     private User testUser;
     private CustomUserDetails userDetails;
@@ -88,6 +96,8 @@ class PostControllerTest {
                        .commentsCount(0)
                        .sharesCount(0)
                        .build();
+
+        given(cloudFrontProperties.domain()).willReturn("test.cloudfront.net");
     }
 
     private void setAuthentication() {
@@ -171,24 +181,67 @@ class PostControllerTest {
         @DisplayName("게시글을 성공적으로 생성한다")
         @WithMockUser
         void createPostSuccess() throws Exception {
-            PostCreateRequest request = new PostCreateRequest(
-                "새로운 게시글 내용",
-                List.of(new FileInfo("https://s3.example.com/file.jpg", "file.jpg", 1024L)),
-                null
-            );
+            PostCreateRequest request = new PostCreateRequest("새로운 게시글 내용", null, null);
 
             Post savedPost = Post.builder()
                                  .user(testUser)
                                  .content("새로운 게시글 내용")
                                  .build();
 
-            given(postService.createPostWithFiles(any(Post.class), anyList())).willReturn(savedPost);
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
 
-            mockMvc.perform(post("/api/post")
+            given(postService.createPost(any(User.class), any(PostCreateRequest.class), any()))
+                .willReturn(savedPost);
+
+            mockMvc.perform(multipart("/api/post")
+                       .file(requestPart)
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request)))
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
+                   .andDo(print())
+                   .andExpect(status().isCreated())
+                   .andExpect(header().exists("Location"));
+        }
+
+        @Test
+        @DisplayName("파일과 함께 게시글을 생성한다")
+        @WithMockUser
+        void createPostWithFiles() throws Exception {
+            PostCreateRequest request = new PostCreateRequest("파일이 있는 게시글", null, null);
+
+            Post savedPost = Post.builder()
+                                 .user(testUser)
+                                 .content("파일이 있는 게시글")
+                                 .build();
+
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
+
+            MockMultipartFile filePart = new MockMultipartFile(
+                "files",
+                "test.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test image content".getBytes()
+            );
+
+            given(postService.createPost(any(User.class), any(PostCreateRequest.class), anyList()))
+                .willReturn(savedPost);
+
+            mockMvc.perform(multipart("/api/post")
+                       .file(requestPart)
+                       .file(filePart)
+                       .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andDo(print())
                    .andExpect(status().isCreated())
                    .andExpect(header().exists("Location"));
@@ -200,11 +253,18 @@ class PostControllerTest {
         void createPostWithEmptyContent() throws Exception {
             PostCreateRequest request = new PostCreateRequest("", null, null);
 
-            mockMvc.perform(post("/api/post")
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
+
+            mockMvc.perform(multipart("/api/post")
+                       .file(requestPart)
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request)))
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andDo(print())
                    .andExpect(status().isBadRequest());
         }
@@ -214,11 +274,18 @@ class PostControllerTest {
         void createPostUnauthorized() throws Exception {
             PostCreateRequest request = new PostCreateRequest("새로운 게시글", null, null);
 
-            mockMvc.perform(post("/api/post")
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
+
+            mockMvc.perform(multipart("/api/post")
+                       .file(requestPart)
                        .with(SecurityMockMvcRequestPostProcessors.anonymous())
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request)))
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andDo(print())
                    .andExpect(status().isUnauthorized());
         }
@@ -232,32 +299,94 @@ class PostControllerTest {
         @DisplayName("게시글을 성공적으로 수정한다")
         @WithMockUser
         void updatePostSuccess() throws Exception {
-            PostUpdateRequest request = new PostUpdateRequest("수정된 내용", Collections.emptyList(), null);
+            PostUpdateRequest request = new PostUpdateRequest(
+                "수정된 내용", null, null, null, null, null
+            );
 
-            doNothing().when(postService).updatePostContent(anyLong(), any(), anyList(), any(), any(User.class));
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
 
-            mockMvc.perform(put("/api/post/{postId}", 1L)
+            doNothing().when(postService).updatePost(anyLong(), any(User.class),
+                any(PostUpdateRequest.class), any());
+
+            mockMvc.perform(multipart("/api/post/{postId}", 1L)
+                       .file(requestPart)
+                       .with(req -> {
+                           req.setMethod("PUT");
+                           return req;
+                       })
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request)))
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andDo(print())
                    .andExpect(status().isNoContent());
 
-            verify(postService).updatePostContent(eq(1L), eq("수정된 내용"), anyList(), any(), any(User.class));
+            verify(postService).updatePost(eq(1L), any(User.class),
+                any(PostUpdateRequest.class), any());
+        }
+
+        @Test
+        @DisplayName("파일 삭제와 순서 변경을 포함한 수정")
+        @WithMockUser
+        void updatePostWithFileChanges() throws Exception {
+            PostUpdateRequest request = new PostUpdateRequest(
+                "수정된 내용",
+                null,
+                null,
+                List.of(1L, 2L),  // deleteFileIds
+                List.of(new com.project.codelight.post.dto.request.FileOrderUpdate(3L, 0)),  // fileOrders
+                null
+            );
+
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
+
+            doNothing().when(postService).updatePost(anyLong(), any(User.class),
+                any(PostUpdateRequest.class), any());
+
+            mockMvc.perform(multipart("/api/post/{postId}", 1L)
+                       .file(requestPart)
+                       .with(req -> {
+                           req.setMethod("PUT");
+                           return req;
+                       })
+                       .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
+                   .andDo(print())
+                   .andExpect(status().isNoContent());
         }
 
         @Test
         @DisplayName("수정할 내용이 비어있으면 400을 반환한다")
         @WithMockUser
         void updatePostWithEmptyContent() throws Exception {
-            PostUpdateRequest request = new PostUpdateRequest("", null, null);
+            PostUpdateRequest request = new PostUpdateRequest("", null, null, null, null, null);
 
-            mockMvc.perform(put("/api/post/{postId}", 1L)
+            MockMultipartFile requestPart = new MockMultipartFile(
+                "request",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(request)
+            );
+
+            mockMvc.perform(multipart("/api/post/{postId}", 1L)
+                       .file(requestPart)
+                       .with(req -> {
+                           req.setMethod("PUT");
+                           return req;
+                       })
                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request)))
+                       .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andDo(print())
                    .andExpect(status().isBadRequest());
         }
