@@ -80,6 +80,12 @@ public class Poll {
         }
     }
 
+    public void decrementVotes() {
+        if (this.totalVotes != null && this.totalVotes > 0) {
+            this.totalVotes--;
+        }
+    }
+
     public void setEndsAt(LocalDateTime endsAt) {
         this.endsAt = endsAt;
     }
