@@ -3,4 +3,5 @@ export const ROUTE_PATH = {
   signUp: '/sign-up',
   signIn: '/sign-in',
   kakaoCallback: '/oauth/kakao/callback',
+  postDetail: '/post/:postId',
 };
