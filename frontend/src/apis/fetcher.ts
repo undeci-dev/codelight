@@ -6,7 +6,7 @@ import { BASE_URL, ENDPOINT } from '@/apis/endpoint';
 interface HttpRequestOptions {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  body?: object;
+  body?: object | FormData;
   headers?: HeadersInit;
   params?: Record<string, string | string[] | number>;
   isRetry?: boolean;
@@ -57,8 +57,10 @@ const refreshAccessToken = async (): Promise<boolean> => {
     });
 
     if (response.ok) {
-      const data = await response.json();
-      useAuthStore.getState().setAccessToken(data.accessToken);
+      const accessToken = response.headers.get('Authorization');
+      if (accessToken) {
+        useAuthStore.getState().setAccessToken(accessToken);
+      }
       return true;
     }
     return false;
@@ -82,13 +84,16 @@ const fetchRequest = ({
   const accessToken = useAuthStore.getState().getAccessToken();
 
   if (accessToken) {
-    finalHeaders.set('Authorization', `Bearer ${accessToken}`);
+    finalHeaders.set('Authorization', `${accessToken}`);
   }
+
+  const isFormData = body instanceof FormData;
 
   return fetch(buildUrl(url, params), {
     method,
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     headers: finalHeaders,
+    credentials: 'include',
   });
 };
 
@@ -111,16 +116,19 @@ const buildUrl = (
 
 const call =
   (method: HttpRequestOptions['method']) =>
-  (p: MethodlessRequestOptions & { body?: unknown }) =>
-    request({
+  (p: MethodlessRequestOptions & { body?: unknown }) => {
+    const isFormData = p.body instanceof FormData;
+    return request({
       ...p,
       method,
       headers:
         (method === 'POST' || method === 'PUT' || method === 'PATCH') &&
-        p.body !== null
+        p.body !== null &&
+        !isFormData
           ? withJson(p.headers)
           : p.headers,
     });
+  };
 
 const withJson = (h?: HeadersInit): Headers =>
   mergeHeaders(h, { 'Content-Type': 'application/json' });
