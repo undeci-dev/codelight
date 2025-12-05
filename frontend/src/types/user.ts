@@ -1,13 +1,3 @@
-export type UserType = 'ADMIN' | 'USER' | 'GUEST';
-
-export interface User {
-  userId: number;
-  userName: string;
-  userEmail: string;
-  userType: UserType;
-  createdAt: string;
-}
-
 export interface TokenValidity {
   hasAccessToken: boolean;
   hasRefreshToken: boolean;

@@ -1,6 +1,6 @@
 import fetcher from '@/apis/fetcher';
 import { BASE_URL, ENDPOINT } from '@/apis/endpoint';
-import { SignInResponse, KakaoLoginResponse } from '@/types/user';
+import { SignInResponse } from '@/types/user';
 import AppError from '@/core/error/AppError';
 import useAuthStore from '@/store/useAuthStore';
 
@@ -36,7 +36,11 @@ export const signIn = async ({
   if (data.status !== 200)
     throw new AppError(data.status, 'USER_ACCOUNT_DELETED');
 
-  useAuthStore.getState().setAccessToken(data.accessToken);
+  const accessToken = response.headers.get('Authorization');
+  if (accessToken) {
+    useAuthStore.getState().setAccessToken(accessToken);
+  }
+
   return response;
 };
 
@@ -47,7 +51,6 @@ export const logOut = async () => {
     return response;
   } catch (err) {
     throw new AppError(500, 'INTERNAL_SERVER_ERROR');
-    throw err;
   }
 };
 
@@ -57,8 +60,10 @@ export const kakaoLogin = async ({ code }: { code: string }) => {
     params: { code },
   });
 
-  const data: KakaoLoginResponse = await response.json();
+  const accessToken = response.headers.get('Authorization');
+  if (accessToken) {
+    useAuthStore.getState().setAccessToken(accessToken);
+  }
 
-  useAuthStore.getState().setAccessToken(data.accessToken);
   return response;
 };
