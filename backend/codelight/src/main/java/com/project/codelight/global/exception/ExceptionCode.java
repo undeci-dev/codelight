@@ -108,6 +108,7 @@ public enum ExceptionCode {
     POLL_MULTIPLE_VOTE_NOT_ALLOWED,
     POLL_ALREADY_VOTED,
     POLL_ALREADY_EXISTS,
+    POLL_VOTE_NOT_FOUND,
     UNAUTHORIZED,
 
     // ========== 발표 (PRESENTATION) ==========
