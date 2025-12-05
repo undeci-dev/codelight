@@ -170,6 +170,8 @@ public enum ExceptionCodeType {
         "이미 투표가 진행된 투표는 수정할 수 없습니다."),
     POLL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, ExceptionCode.POLL_ALREADY_EXISTS,
         "이미 투표가 존재합니다."),
+    POLL_VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, ExceptionCode.POLL_VOTE_NOT_FOUND,
+        "투표 기록을 찾을 수 없습니다."),
     UNAUTHORIZED(HttpStatus.FORBIDDEN, ExceptionCode.UNAUTHORIZED,
         "해당 리소스에 대한 권한이 없습니다."),
 
