@@ -53,6 +53,9 @@ dependencies {
 	//AWS S3
 	implementation 'software.amazon.awssdk:s3:2.29.26'
 
+	//Jsoup - HTML parsing
+	implementation 'org.jsoup:jsoup:1.18.1'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
