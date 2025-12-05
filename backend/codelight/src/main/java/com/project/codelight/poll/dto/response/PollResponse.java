@@ -9,21 +9,24 @@ import java.util.Set;
 
 public record PollResponse(
     Long pollId,
-//    Long postId,
     String question,
     boolean multipleChoice,
     LocalDateTime endsAt,
     int totalVotes,
     boolean hasVoted,
     boolean isExpired,
+    List<Long> votedOptionIds,
     List<PollOptionResponse> options
 ) {
 
     public static PollResponse from(Poll poll, List<PollOption> options, Set<Long> votedOptionIds,
                                     boolean hasVoted) {
+        int totalVotes = poll.getTotalVotes() != null ? poll.getTotalVotes() : 0;
+
         List<PollOptionResponse> optionResponses = options.stream()
             .sorted(Comparator.comparing(PollOption::getDisplayOrder))
-            .map(option -> PollOptionResponse.from(option, votedOptionIds.contains(option.getId())))
+            .map(option -> PollOptionResponse.from(
+                option, votedOptionIds.contains(option.getId()), totalVotes))
             .toList();
 
         boolean isExpired = poll.getEndsAt() != null && poll.getEndsAt().isBefore(LocalDateTime.now());
@@ -33,17 +36,20 @@ public record PollResponse(
             poll.getQuestion(),
             poll.getMultipleChoice() != null && poll.getMultipleChoice(),
             poll.getEndsAt(),
-            poll.getTotalVotes() != null ? poll.getTotalVotes() : 0,
+            totalVotes,
             hasVoted,
             isExpired,
+            votedOptionIds.stream().toList(),
             optionResponses
         );
     }
 
     public static PollResponse from(Poll poll, List<PollOption> options) {
+        int totalVotes = poll.getTotalVotes() != null ? poll.getTotalVotes() : 0;
+
         List<PollOptionResponse> optionResponses = options.stream()
             .sorted(Comparator.comparing(PollOption::getDisplayOrder))
-            .map(option -> PollOptionResponse.from(option, false))
+            .map(option -> PollOptionResponse.from(option, false, totalVotes))
             .toList();
 
         boolean isExpired = poll.getEndsAt() != null && poll.getEndsAt().isBefore(LocalDateTime.now());
@@ -53,9 +59,10 @@ public record PollResponse(
             poll.getQuestion(),
             poll.getMultipleChoice() != null && poll.getMultipleChoice(),
             poll.getEndsAt(),
-            poll.getTotalVotes() != null ? poll.getTotalVotes() : 0,
+            totalVotes,
             false,
             isExpired,
+            List.of(),
             optionResponses
         );
     }

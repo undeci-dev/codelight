@@ -54,6 +54,12 @@ public class PollOption {
         this.votesCount++;
     }
 
+    public void decrementVotes() {
+        if (this.votesCount > 0) {
+            this.votesCount--;
+        }
+    }
+
     public void updateOptionText(String optionText) {
         this.optionText = optionText;
     }

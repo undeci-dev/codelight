@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -278,6 +279,36 @@ class PollControllerTest {
                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                        .contentType(MediaType.APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request)))
+                   .andDo(print())
+                   .andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Nested
+    @DisplayName("투표 취소 API")
+    class CancelVoteTest {
+
+        @Test
+        @DisplayName("투표를 성공적으로 취소한다")
+        @WithMockUser
+        void cancelVoteSuccess() throws Exception {
+            doNothing().when(pollService).cancelVote(anyLong(), any(User.class));
+
+            mockMvc.perform(delete("/api/poll/{pollId}/vote", 1L)
+                       .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                   .andDo(print())
+                   .andExpect(status().isNoContent());
+
+            verify(pollService).cancelVote(eq(1L), any(User.class));
+        }
+
+        @Test
+        @DisplayName("비로그인 사용자는 투표를 취소할 수 없다")
+        void cancelVoteUnauthorized() throws Exception {
+            mockMvc.perform(delete("/api/poll/{pollId}/vote", 1L)
+                       .with(SecurityMockMvcRequestPostProcessors.anonymous())
+                       .with(SecurityMockMvcRequestPostProcessors.csrf()))
                    .andDo(print())
                    .andExpect(status().isUnauthorized());
         }

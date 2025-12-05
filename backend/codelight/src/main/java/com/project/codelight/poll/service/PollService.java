@@ -138,12 +138,48 @@ public class PollService {
     }
 
     @Transactional
+    public void cancelVote(Long pollId, User user) {
+        Poll poll = getPollById(pollId);
+
+        List<PollVote> votes = pollVoteRepository.findByPollAndUser(poll, user);
+        if (votes.isEmpty()) {
+            throw new CodeLightException(ExceptionCodeType.POLL_VOTE_NOT_FOUND);
+        }
+
+        for (PollVote vote : votes) {
+            PollOption option = vote.getOption();
+            option.decrementVotes();
+            pollOptionRepository.save(option);
+            pollVoteRepository.delete(vote);
+        }
+
+        poll.decrementVotes();
+        pollRepository.save(poll);
+    }
+
+    @Transactional
     public void deletePollByPost(Post post) {
         pollRepository.findByPost(post).ifPresent(poll -> {
             pollVoteRepository.deleteAllByPoll(poll);
             pollOptionRepository.deleteAllByPoll(poll);
             pollRepository.deleteByPost(post);
         });
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasAnyVotes(Post post) {
+        return pollRepository.findByPost(post)
+            .map(poll -> pollVoteRepository.countByPoll(poll) > 0)
+            .orElse(false);
+    }
+
+    @Transactional
+    public void updatePoll(Post post, PollCreateRequest request) {
+        Poll poll = pollRepository.findByPost(post)
+            .orElseThrow(() -> new CodeLightException(ExceptionCodeType.POLL_NOT_FOUND));
+
+        poll.update(request.question(), request.endsAt());
+        pollRepository.save(poll);
     }
 
     private void validateOptions(List<PollOption> options) {
