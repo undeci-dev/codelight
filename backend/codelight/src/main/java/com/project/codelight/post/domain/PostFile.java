@@ -33,6 +33,9 @@ public class PostFile {
     @Column(name = "file_url", length = 500, nullable = false)
     private String fileUrl;
 
+    @Column(name = "s3_key", length = 500)
+    private String s3Key;
+
     @Column(name = "file_name", length = 255)
     private String fileName;
 
@@ -45,11 +48,13 @@ public class PostFile {
     @Builder
     private PostFile(Post post,
                      String fileUrl,
+                     String s3Key,
                      String fileName,
                      Long fileSize,
                      Integer displayOrder) {
         this.post = post;
         this.fileUrl = fileUrl;
+        this.s3Key = s3Key;
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.displayOrder = displayOrder != null ? displayOrder : 0;
