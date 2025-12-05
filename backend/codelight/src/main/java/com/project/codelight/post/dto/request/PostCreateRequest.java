@@ -1,5 +1,6 @@
 package com.project.codelight.post.dto.request;
 
+import com.project.codelight.link.dto.request.LinkCreateRequest;
 import com.project.codelight.poll.dto.request.PollCreateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -9,15 +10,10 @@ public record PostCreateRequest(
     @NotBlank(message = "내용은 필수입니다.")
     String content,
 
-    List<FileInfo> files,
+    @Valid
+    PollCreateRequest poll,
 
     @Valid
-    PollCreateRequest poll
+    List<LinkCreateRequest> links
 ) {
-    public record FileInfo(
-        String fileUrl,
-        String fileName,
-        Long fileSize
-    ) {
-    }
 }
