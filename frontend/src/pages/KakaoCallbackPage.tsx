@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import useKakaoOAuthMutation from '@/hooks/useKakaoOAuthMutation';
+import { useKakaoOAuthMutation } from '@/hooks/query/useAuthQuery';
 import { ROUTE_PATH } from '@/constants/routhPath';
 import Text from '@/components/_common/Text/Text';
 

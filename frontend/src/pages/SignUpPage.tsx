@@ -5,9 +5,8 @@ import Button from '@/components/_common/Button/Button';
 import InputField from '@/components/_common/InputField/InputField';
 import Text from '@/components/_common/Text/Text';
 import { ROUTE_PATH } from '@/constants/routhPath';
-import useSignUpMutation from '@/hooks/useSignUpMutation';
+import { useSignUpMutation } from '@/hooks/query/useAuthQuery';
 import useValidateInput from '@/hooks/useValidateInput';
-import logo from '@/assets/images/common/codelight-logo.svg';
 import {
   validateEmail,
   validateLength,
@@ -74,7 +73,6 @@ const SignUpPage = () => {
         onError: (error) => setErrorMessage(error.message),
         onSuccess: () => {
           setErrorMessage('');
-          // 토스트 메시지 표시 후 로그인 페이지로 이동
           setTimeout(() => {
             navigate(ROUTE_PATH.signIn);
           }, 1500);
@@ -96,7 +94,6 @@ const SignUpPage = () => {
   return (
     <>
       <div className='flex h-[calc(100dvh-56px)] flex-col items-center justify-center gap-4'>
-        <img src={logo} alt='Codelight Logo' className='mb-8 h-12' />
         <div className='relative flex w-[36.1rem] flex-col gap-0 rounded-2xl px-6'>
           <InputField onKeyDown={handleKeyDown}>
             <InputField.Label label='이메일' />
