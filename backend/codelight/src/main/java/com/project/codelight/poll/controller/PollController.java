@@ -15,6 +15,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +64,17 @@ public class PollController {
 
         Poll poll = pollService.getPollById(pollId);
         return ResponseEntity.ok(buildPollResponse(poll, user));
+    }
+
+    @DeleteMapping("/api/poll/{pollId}/vote")
+    public ResponseEntity<Void> cancelVote(
+        @PathVariable Long pollId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        User user = userDetails.getUser();
+        pollService.cancelVote(pollId, user);
+
+        return ResponseEntity.noContent().build();
     }
 
     private PollResponse buildPollResponse(Poll poll, User user) {
