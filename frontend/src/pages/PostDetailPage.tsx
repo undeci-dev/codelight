@@ -12,6 +12,9 @@ import {
   GripVertical,
 } from 'lucide-react';
 import Text from '@/components/_common/Text/Text';
+import SEO from '@/components/_common/SEO/SEO';
+import ShareModal from '@/components/_common/Share/ShareModal';
+import { getPostShareUrl } from '@/utils/share';
 import FeedCommentItem from '@/components/_common/Feed/FeedCommentItem';
 import FeedCommentInput from '@/components/_common/Feed/FeedCommentInput';
 import FeedPoll from '@/components/_common/Feed/FeedPoll';
@@ -57,6 +60,7 @@ const PostDetailPage = () => {
   const [isLinkLoading, setIsLinkLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const MAX_FILES = 4;
 
@@ -479,8 +483,35 @@ const PostDetailPage = () => {
   const comments = commentsData?.comments ?? [];
   const totalComments = commentsData?.totalCount ?? 0;
 
+  const shareUrl = getPostShareUrl(numericPostId);
+  const postPreview =
+    post.content.slice(0, 100) + (post.content.length > 100 ? '...' : '');
+  const postImage = post.files?.[0]?.fileUrl;
+
   return (
     <>
+      {/* SEO 메타 태그 */}
+      <SEO
+        title={`${post.userName}님의 게시물`}
+        description={postPreview}
+        image={postImage}
+        url={shareUrl}
+        type='article'
+        author={post.userName}
+      />
+
+      {/* 공유 모달 */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        shareData={{
+          title: `${post.userName}님의 게시물 - CodeLight`,
+          text: postPreview,
+          url: shareUrl,
+          imageUrl: postImage,
+        }}
+      />
+
       {/* 서브 헤더 */}
       <div className='border-b border-gray-200 bg-white px-4 py-3'>
         <div className='mx-auto flex max-w-2xl items-center gap-4'>
@@ -801,7 +832,10 @@ const PostDetailPage = () => {
               )}
             </button>
 
-            <button className='flex items-center gap-2 text-gray-500 transition-colors hover:text-green-500'>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className='flex items-center gap-2 text-gray-500 transition-colors hover:text-green-500'
+            >
               <Share2 size={20} />
             </button>
           </div>
