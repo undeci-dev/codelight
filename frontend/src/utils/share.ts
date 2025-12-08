@@ -1,3 +1,5 @@
+import codelightLogo from '@/assets/images/common/codelight-logo.svg';
+
 export interface ShareData {
   title: string;
   text?: string;
@@ -11,6 +13,10 @@ export const getPostShareUrl = (postId: number): string => {
   return `${baseUrl}/post/${postId}`;
 };
 
+export const getDefaultImageUrl = (): string => {
+  return `${window.location.origin}${codelightLogo}`;
+};
+
 export const getLinkedInShareUrl = (data: ShareData): string => {
   const encodedUrl = encodeURIComponent(data.url);
   return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
@@ -21,7 +27,6 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    // Fallback for older browsers
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -123,7 +128,7 @@ export const shareToKakao = (
     content: {
       title: data.title,
       description: data.text,
-      imageUrl: data.imageUrl || `${window.location.origin}/og-image.png`,
+      imageUrl: data.imageUrl || getDefaultImageUrl(),
       link: {
         mobileWebUrl: data.url,
         webUrl: data.url,
