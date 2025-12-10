@@ -7,10 +7,27 @@ import {
   PostUpdateRequest,
 } from '@/types/post';
 
-export const getPosts = async (): Promise<PostsResponse> => {
-  const response = await fetcher.get({
-    url: BASE_URL + ENDPOINT.POSTS,
-  });
+export interface GetPostsParams {
+  lastPostId?: number;
+  keyword?: string;
+}
+
+export const getPosts = async (
+  params?: GetPostsParams
+): Promise<PostsResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.lastPostId) {
+    searchParams.append('lastPostId', params.lastPostId.toString());
+  }
+  if (params?.keyword) {
+    searchParams.append('keyword', params.keyword);
+  }
+
+  const queryString = searchParams.toString();
+  const url = `${BASE_URL}${ENDPOINT.POSTS}${queryString ? `?${queryString}` : ''}`;
+
+  const response = await fetcher.get({ url });
   return response.json();
 };
 

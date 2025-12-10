@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { useAppMutation } from '@/hooks/useAppMutation';
 import {
   getPosts,
@@ -10,7 +10,11 @@ import {
 } from '@/apis/post';
 import { votePoll, cancelVote } from '@/apis/poll';
 import { useAppQuery } from '@/hooks/useAppQuery';
-import { PostCreateRequest, PostUpdateRequest } from '@/types/post';
+import {
+  PostCreateRequest,
+  PostUpdateRequest,
+  PostsResponse,
+} from '@/types/post';
 
 export const useCreatePostMutation = () => {
   const queryClient = useQueryClient();
@@ -90,7 +94,27 @@ export const useSelectPostQuery = (postId: number) => {
 export const useSelectPostsQuery = () => {
   return useAppQuery({
     queryKey: ['posts', 'select'],
-    queryFn: getPosts,
+    queryFn: () => getPosts(),
+  });
+};
+
+export const useInfinitePostsQuery = (keyword?: string) => {
+  return useInfiniteQuery<PostsResponse, Error>({
+    queryKey: ['posts', 'list', keyword],
+    queryFn: ({ pageParam }) =>
+      getPosts({
+        lastPostId: pageParam as number | undefined,
+        keyword: keyword || undefined,
+      }),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasNext || lastPage.posts.length === 0) {
+        return undefined;
+      }
+      // 마지막 게시글의 ID를 다음 페이지 파라미터로 사용
+      const lastPost = lastPage.posts[lastPage.posts.length - 1];
+      return lastPost.postId;
+    },
   });
 };
 
