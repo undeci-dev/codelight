@@ -8,6 +8,10 @@ import com.project.codelight.auth.security.filter.JwtAuthorizationFilter;
 import com.project.codelight.auth.security.handler.CustomAuthFailureHandler;
 import com.project.codelight.auth.security.handler.CustomAuthSuccessHandler;
 import com.project.codelight.auth.security.handler.CustomAuthenticationProvider;
+import com.project.codelight.auth.security.oauth2.CustomOAuth2UserService;
+import com.project.codelight.auth.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.project.codelight.auth.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.project.codelight.auth.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +41,10 @@ public class WebSecurityConfig {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenBlackListRepository tokenBlackListRepository;
     private final CorsProperties corsProperties;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -44,17 +52,29 @@ public class WebSecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .authorizationEndpoint(authorization -> authorization
+                    .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                )
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService)
+                )
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
             )
             .addFilterBefore(jwtAuthorizationFilter(),
                 BasicAuthenticationFilter.class)
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(customAuthenticationFilter(),
                 UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
+            .logout(AbstractHttpConfigurer::disable)
             .build();
     }
 
@@ -112,7 +132,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(tokenBlackListRepository);
+        return new JwtAuthorizationFilter(tokenBlackListRepository, objectMapper);
     }
 
 
