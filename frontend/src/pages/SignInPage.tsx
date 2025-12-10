@@ -8,7 +8,7 @@ import { ROUTE_PATH } from '@/constants/routhPath';
 import { useSignInMutation } from '@/hooks/query/useAuthQuery';
 import useValidateInput from '@/hooks/useValidateInput';
 import { validateEmail, validatePassword } from '@/utils/authValidation';
-import { getKakaoAuthUrl } from '@/constants/oauth';
+import { BASE_URL, ENDPOINT } from '@/apis/endpoint';
 
 const SignInPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -64,7 +64,7 @@ const SignInPage = () => {
   };
 
   const handleKakaoLogin = () => {
-    window.location.href = getKakaoAuthUrl();
+    window.location.href = BASE_URL + ENDPOINT.OAUTH_LOGIN;
   };
 
   return (
