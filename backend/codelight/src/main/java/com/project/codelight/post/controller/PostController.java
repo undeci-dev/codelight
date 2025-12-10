@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,11 +42,24 @@ public class PostController {
     private final PollService pollService;
     private final CloudFrontProperties cloudFrontProperties;
 
+    private static final int FIRST_PAGE_SIZE = 5;
+    private static final int DEFAULT_PAGE_SIZE = 5;
+
     @GetMapping("/api/posts")
     public ResponseEntity<PostResponses> getPosts(
+        @RequestParam(required = false) Long lastPostId,
+        @RequestParam(required = false) String keyword,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<Post> posts = postService.getActivePosts();
+        List<Post> posts = postService.getActivePosts(lastPostId, keyword);
+
+        int pageSize = (lastPostId == null) ? FIRST_PAGE_SIZE : DEFAULT_PAGE_SIZE;
+        boolean hasNext = posts.size() > pageSize;
+
+        if (hasNext) {
+            posts = posts.subList(0, pageSize);
+        }
+
         List<Long> postIds = posts.stream().map(Post::getId).toList();
 
         User user = userDetails != null ? userDetails.getUser() : null;
@@ -71,7 +85,7 @@ public class PostController {
                                                       );
                                                   })
                                                   .toList();
-        return ResponseEntity.ok(new PostResponses(postList));
+        return ResponseEntity.ok(new PostResponses(postList, hasNext));
     }
 
     @GetMapping("/api/post/{postId}")
