@@ -46,7 +46,7 @@ const SignInPage = () => {
         onSuccess: () => {
           setErrorMessage('');
           setTimeout(() => {
-            navigate(ROUTE_PATH.main);
+            navigate(ROUTE_PATH.feed);
           }, 1500);
         },
       }

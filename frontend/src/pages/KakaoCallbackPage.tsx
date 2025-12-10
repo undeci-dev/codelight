@@ -30,7 +30,7 @@ const KakaoCallbackPage = () => {
           if (accessToken) {
             useAuthStore.getState().setAccessToken(accessToken);
           }
-          navigate(ROUTE_PATH.main, {
+          navigate(ROUTE_PATH.feed, {
             replace: true,
           });
         } else {

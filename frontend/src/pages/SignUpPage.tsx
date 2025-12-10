@@ -74,7 +74,7 @@ const SignUpPage = () => {
         onSuccess: () => {
           setErrorMessage('');
           setTimeout(() => {
-            navigate(ROUTE_PATH.signIn);
+            navigate(ROUTE_PATH.main);
           }, 1500);
         },
       }
