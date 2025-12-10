@@ -2,20 +2,33 @@ package com.project.codelight.post.repository;
 
 import com.project.codelight.post.domain.Post;
 import com.project.codelight.user.domain.User;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @EntityGraph(attributePaths = {"files", "links", "poll"})
-    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false ORDER BY p.createdAt DESC")
-    List<Post> findActivePosts();
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false ORDER BY p.id DESC")
+    List<Post> findActivePostsFirst(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"files", "links", "poll"})
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false AND p.id < :lastPostId ORDER BY p.id DESC")
+    List<Post> findActivePostsAfter(@Param("lastPostId") Long lastPostId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"files", "links", "poll"})
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false AND p.content LIKE %:keyword% ORDER BY p.id DESC")
+    List<Post> findActivePostsByKeywordFirst(@Param("keyword") String keyword, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"files", "links", "poll"})
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.poll poll LEFT JOIN FETCH poll.options WHERE p.deleted = false AND p.content LIKE %:keyword% AND p.id < :lastPostId ORDER BY p.id DESC")
+    List<Post> findActivePostsByKeywordAfter(@Param("keyword") String keyword, @Param("lastPostId") Long lastPostId, Pageable pageable);
 
     @Query("SELECT p FROM Post p WHERE p.user = :user AND p.deleted = false ORDER BY p.createdAt DESC")
     List<Post> findAllByUserNotDeleted(@Param("user") User user);

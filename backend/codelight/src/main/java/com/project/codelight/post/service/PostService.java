@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +43,24 @@ public class PostService {
     private final LinkPreviewService linkPreviewService;
     private final S3Service s3Service;
 
-    public List<Post> getActivePosts() {
-        return postRepository.findActivePosts();
+    private static final int FIRST_PAGE_SIZE = 5;
+    private static final int DEFAULT_PAGE_SIZE = 5;
+
+    public List<Post> getActivePosts(Long lastPostId, String keyword) {
+        Pageable firstPageable = PageRequest.of(0, FIRST_PAGE_SIZE + 1);
+        Pageable defaultPageable = PageRequest.of(0, DEFAULT_PAGE_SIZE + 1);
+
+        if (keyword != null && !keyword.isBlank()) {
+            if (lastPostId == null) {
+                return postRepository.findActivePostsByKeywordFirst(keyword, firstPageable);
+            }
+            return postRepository.findActivePostsByKeywordAfter(keyword, lastPostId, defaultPageable);
+        }
+
+        if (lastPostId == null) {
+            return postRepository.findActivePostsFirst(firstPageable);
+        }
+        return postRepository.findActivePostsAfter(lastPostId, defaultPageable);
     }
 
     public Optional<Post> getActivePostById(Long postId) {
