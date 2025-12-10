@@ -53,17 +53,3 @@ export const logOut = async () => {
     throw new AppError(500, 'INTERNAL_SERVER_ERROR');
   }
 };
-
-export const kakaoLogin = async ({ code }: { code: string }) => {
-  const response = await fetcher.post({
-    url: `${BASE_URL}${ENDPOINT.OAUTH_LOGIN}`,
-    params: { code },
-  });
-
-  const accessToken = response.headers.get('Authorization');
-  if (accessToken) {
-    useAuthStore.getState().setAccessToken(accessToken);
-  }
-
-  return response;
-};
