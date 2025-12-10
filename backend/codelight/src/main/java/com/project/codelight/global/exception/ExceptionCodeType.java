@@ -29,6 +29,23 @@ public enum ExceptionCodeType {
     USER_EMAIL_INVALID_FORMAT(HttpStatus.BAD_REQUEST, ExceptionCode.USER_EMAIL_INVALID_FORMAT,
         "이메일 형식이 올바르지 않습니다."),
 
+    // OAuth2
+    OAUTH_PROVIDER_ERROR(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_PROVIDER_ERROR,
+        "OAuth 제공자 연동 중 오류가 발생했습니다."),
+    OAUTH_INVALID_STATE(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_INVALID_STATE,
+        "유효하지 않은 OAuth 상태입니다."),
+    OAUTH_CALLBACK_ERROR(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_CALLBACK_ERROR,
+        "OAuth 콜백 처리 중 오류가 발생했습니다."),
+    OAUTH_TOKEN_REQUEST_FAILED(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_TOKEN_REQUEST_FAILED,
+        "OAuth 액세스 토큰 요청에 실패했습니다."),
+    OAUTH_USER_INFO_REQUEST_FAILED(HttpStatus.BAD_REQUEST,
+        ExceptionCode.OAUTH_USER_INFO_REQUEST_FAILED,
+        "OAuth 사용자 정보 요청에 실패했습니다."),
+    OAUTH_SERVER_ERROR(HttpStatus.BAD_GATEWAY, ExceptionCode.OAUTH_SERVER_ERROR,
+        "OAuth 서버에서 오류가 발생했습니다."),
+    OAUTH_EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_EMAIL_NOT_PROVIDED,
+        "OAuth 제공자로부터 이메일 정보를 받지 못했습니다."),
+
     // 로그인
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, ExceptionCode.USER_NOT_FOUND, "유저가 존재하지 않습니다."),
     USER_LOGIN_REQUEST_ERROR(HttpStatus.UNAUTHORIZED, ExceptionCode.USER_LOGIN_REQUEST_ERROR,
@@ -47,23 +64,6 @@ public enum ExceptionCodeType {
     TOKEN_REFRESH_FAILED(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_REFRESH_FAILED,
         "토큰 갱신에 실패했습니다."),
     TOKEN_BLACKLISTED(HttpStatus.UNAUTHORIZED, ExceptionCode.TOKEN_BLACKLISTED, "무효화된 토큰입니다."),
-
-    // OAuth2
-    OAUTH_PROVIDER_ERROR(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_PROVIDER_ERROR,
-        "OAuth 제공자 연동 중 오류가 발생했습니다."),
-    OAUTH_INVALID_STATE(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_INVALID_STATE,
-        "유효하지 않은 OAuth 상태입니다."),
-    OAUTH_CALLBACK_ERROR(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_CALLBACK_ERROR,
-        "OAuth 콜백 처리 중 오류가 발생했습니다."),
-    OAUTH_TOKEN_REQUEST_FAILED(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_TOKEN_REQUEST_FAILED,
-        "OAuth 액세스 토큰 요청에 실패했습니다."),
-    OAUTH_USER_INFO_REQUEST_FAILED(HttpStatus.BAD_REQUEST,
-        ExceptionCode.OAUTH_USER_INFO_REQUEST_FAILED,
-        "OAuth 사용자 정보 요청에 실패했습니다."),
-    OAUTH_SERVER_ERROR(HttpStatus.BAD_GATEWAY, ExceptionCode.OAUTH_SERVER_ERROR,
-        "OAuth 서버에서 오류가 발생했습니다."),
-    OAUTH_EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, ExceptionCode.OAUTH_EMAIL_NOT_PROVIDED,
-        "OAuth 제공자로부터 이메일 정보를 받지 못했습니다."),
 
     // 권한
     INSUFFICIENT_PERMISSION(HttpStatus.FORBIDDEN, ExceptionCode.INSUFFICIENT_PERMISSION,
