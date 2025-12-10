@@ -33,16 +33,38 @@ const handleError = async (
   response: Response,
   requestProps: HttpRequestOptions
 ): Promise<Response> => {
-  const responseStr = await response.clone().text();
-  const errorCode = JSON.parse(responseStr).codeLightCode;
+  if (response.status === 401) {
+    const responseStr = await response.clone().text();
+    let errorCode = 'UNAUTHORIZED';
 
-  // TOKEN_EXPIRED 처리: 재시도가 아닌 경우에만
-  if (errorCode === 'TOKEN_EXPIRED' && !requestProps.isRetry) {
-    const refreshed = await refreshAccessToken();
-    if (refreshed) {
-      // 토큰 갱신 성공 시 원래 요청 재시도
-      return request({ ...requestProps, isRetry: true });
+    try {
+      errorCode = JSON.parse(responseStr).codeLightCode || 'UNAUTHORIZED';
+    } catch {
+      // JSON 파싱 실패 시 기본값 사용
     }
+
+    // TOKEN_EXPIRED 처리: 재시도가 아닌 경우에만
+    if (errorCode === 'TOKEN_EXPIRED' && !requestProps.isRetry) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        // 토큰 갱신 성공 시 원래 요청 재시도
+        return request({ ...requestProps, isRetry: true });
+      }
+    }
+
+    // 토큰 갱신 실패 또는 일반 401: 로그아웃 후 로그인 페이지로 이동
+    useAuthStore.getState().clearAccessToken();
+    window.location.href = '/sign-in';
+    throw new AppError(401, errorCode);
+  }
+
+  const responseStr = await response.clone().text();
+  let errorCode = 'UNKNOWN_ERROR';
+
+  try {
+    errorCode = JSON.parse(responseStr).codeLightCode || 'UNKNOWN_ERROR';
+  } catch {
+    // JSON 파싱 실패 시 기본값 사용
   }
 
   const appError = new AppError(response.status, errorCode);
