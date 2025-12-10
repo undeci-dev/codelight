@@ -38,12 +38,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import com.project.codelight.config.TestSecurityConfig;
+import com.project.codelight.auth.config.WebSecurityConfig;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
-@WebMvcTest(CommentController.class)
+@WebMvcTest(controllers = CommentController.class, excludeFilters = {
+    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfig.class)
+})
+@Import(TestSecurityConfig.class)
 class CommentControllerTest {
 
     @Autowired
@@ -57,6 +64,9 @@ class CommentControllerTest {
 
     @MockitoBean
     private CommentLikeService commentLikeService;
+
+    @MockitoBean
+    private com.project.codelight.auth.repository.TokenBlackListRepository tokenBlackListRepository;
 
     private User testUser;
     private CustomUserDetails userDetails;
@@ -83,6 +93,7 @@ class CommentControllerTest {
                        .user(testUser)
                        .content("테스트 게시글")
                        .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(testPost, "id", 1L);
 
         testComment = Comment.builder()
                              .post(testPost)
@@ -90,6 +101,7 @@ class CommentControllerTest {
                              .content("테스트 댓글입니다.")
                              .likesCount(0)
                              .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(testComment, "id", 1L);
     }
 
     @Nested
@@ -98,7 +110,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("로그인한 사용자가 게시글의 댓글 목록을 조회한다")
-        @WithMockUser
         void getCommentsWithAuthentication() throws Exception {
             given(commentService.getCommentsByPost(1L)).willReturn(List.of(testComment));
             given(commentLikeService.getLikedCommentIds(anyList(), any(User.class)))
@@ -133,7 +144,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("로그인한 사용자가 댓글을 조회한다")
-        @WithMockUser
         void getCommentWithAuthentication() throws Exception {
             given(commentService.getCommentById(1L)).willReturn(Optional.of(testComment));
             given(commentLikeService.isLikedByUser(anyLong(), any(User.class))).willReturn(false);
@@ -147,7 +157,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("존재하지 않는 댓글 조회 시 404를 반환한다")
-        @WithMockUser
         void getCommentNotFound() throws Exception {
             given(commentService.getCommentById(999L)).willReturn(Optional.empty());
 
@@ -164,7 +173,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("댓글을 성공적으로 생성한다")
-        @WithMockUser
         void createCommentSuccess() throws Exception {
             CommentCreateRequest request = new CommentCreateRequest("새로운 댓글", null);
 
@@ -183,7 +191,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("대댓글을 성공적으로 생성한다")
-        @WithMockUser
         void createReplySuccess() throws Exception {
             CommentCreateRequest request = new CommentCreateRequest("대댓글입니다", 1L);
 
@@ -201,7 +208,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("내용이 비어있으면 400을 반환한다")
-        @WithMockUser
         void createCommentWithEmptyContent() throws Exception {
             CommentCreateRequest request = new CommentCreateRequest("", null);
 
@@ -235,7 +241,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("댓글을 성공적으로 수정한다")
-        @WithMockUser
         void updateCommentSuccess() throws Exception {
             CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
@@ -254,7 +259,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("수정할 내용이 비어있으면 400을 반환한다")
-        @WithMockUser
         void updateCommentWithEmptyContent() throws Exception {
             CommentUpdateRequest request = new CommentUpdateRequest("");
 
@@ -274,7 +278,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("댓글을 성공적으로 삭제한다")
-        @WithMockUser
         void deleteCommentSuccess() throws Exception {
             doNothing().when(commentService).deleteComment(anyLong(), any(User.class));
 
@@ -294,7 +297,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("좋아요를 성공적으로 토글한다 - 좋아요 추가")
-        @WithMockUser
         void toggleLikeAdd() throws Exception {
             given(commentLikeService.toggleLike(anyLong(), any(User.class))).willReturn(true);
 
@@ -308,7 +310,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("좋아요를 성공적으로 토글한다 - 좋아요 취소")
-        @WithMockUser
         void toggleLikeRemove() throws Exception {
             given(commentLikeService.toggleLike(anyLong(), any(User.class))).willReturn(false);
 
@@ -337,7 +338,6 @@ class CommentControllerTest {
 
         @Test
         @DisplayName("대댓글 목록을 조회한다")
-        @WithMockUser
         void getRepliesSuccess() throws Exception {
             Comment reply = Comment.builder()
                                    .post(testPost)
@@ -345,6 +345,7 @@ class CommentControllerTest {
                                    .parent(testComment)
                                    .content("대댓글입니다")
                                    .build();
+            org.springframework.test.util.ReflectionTestUtils.setField(reply, "id", 2L);
 
             given(commentService.getRepliesByParent(1L)).willReturn(List.of(reply));
             given(commentLikeService.getLikedCommentIds(anyList(), any()))

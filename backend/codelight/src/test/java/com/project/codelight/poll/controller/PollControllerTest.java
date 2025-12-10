@@ -36,12 +36,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import com.project.codelight.config.TestSecurityConfig;
+import com.project.codelight.auth.config.WebSecurityConfig;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
-@WebMvcTest(PollController.class)
+@WebMvcTest(controllers = PollController.class, excludeFilters = {
+    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfig.class)
+})
+@Import(TestSecurityConfig.class)
 class PollControllerTest {
 
     @Autowired
@@ -52,6 +59,9 @@ class PollControllerTest {
 
     @MockitoBean
     private PollService pollService;
+
+    @MockitoBean
+    private com.project.codelight.auth.repository.TokenBlackListRepository tokenBlackListRepository;
 
     private User testUser;
     private CustomUserDetails userDetails;
@@ -79,6 +89,7 @@ class PollControllerTest {
                        .user(testUser)
                        .content("테스트 게시글")
                        .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(testPost, "id", 1L);
 
         testPoll = Poll.builder()
                        .post(testPost)
@@ -87,21 +98,25 @@ class PollControllerTest {
                        .endsAt(LocalDateTime.now().plusDays(7))
                        .totalVotes(0)
                        .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(testPoll, "id", 1L);
 
-        testOptions = List.of(
-            PollOption.builder()
+        PollOption option1 = PollOption.builder()
                       .poll(testPoll)
                       .optionText("Java")
                       .votesCount(0)
                       .displayOrder(0)
-                      .build(),
-            PollOption.builder()
+                      .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(option1, "id", 1L);
+
+        PollOption option2 = PollOption.builder()
                       .poll(testPoll)
                       .optionText("Python")
                       .votesCount(0)
                       .displayOrder(1)
-                      .build()
-        );
+                      .build();
+        org.springframework.test.util.ReflectionTestUtils.setField(option2, "id", 2L);
+
+        testOptions = List.of(option1, option2);
     }
 
     @Nested
@@ -110,7 +125,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("로그인한 사용자가 게시글의 투표를 조회한다")
-        @WithMockUser
         void getPollByPostWithAuthentication() throws Exception {
             given(pollService.getPollByPostId(1L)).willReturn(Optional.of(testPoll));
             given(pollService.getPollOptions(testPoll)).willReturn(testOptions);
@@ -145,7 +159,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("존재하지 않는 투표 조회 시 404를 반환한다")
-        @WithMockUser
         void getPollByPostNotFound() throws Exception {
             given(pollService.getPollByPostId(999L)).willReturn(Optional.empty());
 
@@ -162,7 +175,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("로그인한 사용자가 투표를 조회한다")
-        @WithMockUser
         void getPollWithAuthentication() throws Exception {
             given(pollService.getPollById(1L)).willReturn(testPoll);
             given(pollService.getPollOptions(testPoll)).willReturn(testOptions);
@@ -201,7 +213,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("투표를 성공적으로 한다")
-        @WithMockUser
         void voteSuccess() throws Exception {
             PollVoteRequest request = new PollVoteRequest(List.of(1L));
 
@@ -226,7 +237,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("복수 선택 투표를 성공적으로 한다")
-        @WithMockUser
         void voteMultipleSuccess() throws Exception {
             PollVoteRequest request = new PollVoteRequest(List.of(1L, 2L));
 
@@ -256,7 +266,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("옵션을 선택하지 않으면 400을 반환한다")
-        @WithMockUser
         void voteWithEmptyOptions() throws Exception {
             PollVoteRequest request = new PollVoteRequest(List.of());
 
@@ -290,7 +299,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("투표를 성공적으로 취소한다")
-        @WithMockUser
         void cancelVoteSuccess() throws Exception {
             doNothing().when(pollService).cancelVote(anyLong(), any(User.class));
 
@@ -320,7 +328,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("투표한 사용자의 응답에는 hasVoted가 true이다")
-        @WithMockUser
         void pollResponseWithVotedUser() throws Exception {
             given(pollService.getPollById(1L)).willReturn(testPoll);
             given(pollService.getPollOptions(testPoll)).willReturn(testOptions);
@@ -337,7 +344,6 @@ class PollControllerTest {
 
         @Test
         @DisplayName("투표하지 않은 사용자의 응답에는 hasVoted가 false이다")
-        @WithMockUser
         void pollResponseWithNotVotedUser() throws Exception {
             given(pollService.getPollById(1L)).willReturn(testPoll);
             given(pollService.getPollOptions(testPoll)).willReturn(testOptions);
