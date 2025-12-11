@@ -13,5 +13,5 @@ CodeLight에서는 질문하는 방식도 다양해요.
 ### 백엔드 스택
 [![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1765389791849?alt=media&token=ae00face-1835-4e24-8bdc-7d5e979999ad)](https://github.com/msdio/stackticon)
 
-### 인프라 구조
+### 인프라 구조 [[AWS 인프라 구축 과정]](https://github.com/undeci-dev/codelight/wiki/AWS-%EC%9D%B8%ED%94%84%EB%9D%BC-%EA%B5%AC%EC%A1%B0-%EC%83%9D%EC%84%B1-%EA%B3%BC%EC%A0%95)
 <img width="793" height="391" alt="image" src="https://github.com/user-attachments/assets/05197a27-e9e3-4b8a-beca-4a887f1a25c0" />
